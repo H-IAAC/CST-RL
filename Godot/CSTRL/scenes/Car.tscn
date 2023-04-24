@@ -1,0 +1,45 @@
+[gd_scene load_steps=8 format=3 uid="uid://kkvy0vmp8qcy"]
+
+[ext_resource type="Texture2D" uid="uid://cx4cw10hw08gq" path="res://sprites/cars.png" id="1_1a73w"]
+[ext_resource type="Script" path="res://scenes/scripts/Car.gd" id="1_rechp"]
+[ext_resource type="Texture2D" uid="uid://c3o64pvalistk" path="res://sprites/smoke_particle.png" id="2_hc1yf"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b0yoc"]
+size = Vector2(112, 64)
+
+[sub_resource type="Gradient" id="Gradient_3n6ds"]
+interpolation_mode = 2
+colors = PackedColorArray(0.631373, 0.631373, 0.631373, 1, 0.631373, 0.631373, 0.631373, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_qayar"]
+gradient = SubResource("Gradient_3n6ds")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_aetyf"]
+emission_shape = 3
+emission_box_extents = Vector3(1, 16, 1)
+particle_flag_disable_z = true
+direction = Vector3(-1, 0, 0)
+spread = 15.0
+gravity = Vector3(-8, 0, 0)
+initial_velocity_min = 5.0
+initial_velocity_max = 10.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+scale_min = 0.5
+color_ramp = SubResource("GradientTexture1D_qayar")
+
+[node name="Car" type="Area2D"]
+script = ExtResource("1_rechp")
+
+[node name="Hitbox" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_b0yoc")
+
+[node name="Smoke" type="GPUParticles2D" parent="."]
+position = Vector2(-64, 0)
+amount = 16
+process_material = SubResource("ParticleProcessMaterial_aetyf")
+texture = ExtResource("2_hc1yf")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_1a73w")
+vframes = 3

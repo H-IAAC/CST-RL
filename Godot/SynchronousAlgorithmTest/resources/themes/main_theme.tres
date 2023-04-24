@@ -1,0 +1,29 @@
+[gd_resource type="Theme" load_steps=5 format=3 uid="uid://dpvfhrd6522wp"]
+
+[ext_resource type="Texture2D" uid="uid://b7r8h8ks7why0" path="res://resources/sprites/slider.png" id="1_r7ht5"]
+[ext_resource type="Texture2D" uid="uid://bw8lshy4b4fpi" path="res://resources/sprites/slider_selected.png" id="2_xkn2a"]
+[ext_resource type="FontFile" uid="uid://b1wvtgv8fgr3s" path="res://resources/fonts/foo.otf" id="3_w2q5q"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qofdb"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.329412, 0.329412, 0.329412, 1)
+border_blend = true
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+expand_margin_top = 3.0
+expand_margin_bottom = 5.0
+
+[resource]
+default_font = ExtResource("3_w2q5q")
+default_font_size = 24
+HSlider/icons/grabber = ExtResource("1_r7ht5")
+HSlider/icons/grabber_highlight = ExtResource("2_xkn2a")
+HSlider/styles/slider = SubResource("StyleBoxFlat_qofdb")
+Label/colors/font_outline_color = Color(0.156863, 0.156863, 0.156863, 1)
+Label/constants/outline_size = 8

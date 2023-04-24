@@ -1,0 +1,41 @@
+[gd_scene load_steps=7 format=3 uid="uid://dhdjggf7xuknx"]
+
+[ext_resource type="Texture2D" uid="uid://befgtmk4olesh" path="res://sprites/road_tileset.png" id="1_k17g6"]
+[ext_resource type="Script" path="res://scenes/scripts/Environment.gd" id="1_uob20"]
+[ext_resource type="PackedScene" uid="uid://cbhg21w26sb6u" path="res://scenes/Agent.tscn" id="3_1xwp1"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7pp78"]
+texture = ExtResource("1_k17g6")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+0:1/0 = 0
+0:2/0 = 0
+0:3/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_5q6lb"]
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetAtlasSource_7pp78")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1rgyx"]
+
+[node name="Environment" type="Node2D"]
+script = ExtResource("1_uob20")
+
+[node name="TileMap" type="TileMap" parent="."]
+tile_set = SubResource("TileSet_5q6lb")
+format = 2
+
+[node name="Agent" parent="." instance=ExtResource("3_1xwp1")]
+
+[node name="Cars" type="Node2D" parent="."]
+
+[node name="Win" type="Area2D" parent="."]
+collision_layer = 2
+
+[node name="Hitbox" type="CollisionShape2D" parent="Win"]
+shape = SubResource("RectangleShape2D_1rgyx")
+
+[node name="Timer" type="Timer" parent="."]
+one_shot = true
+
+[connection signal="timeout" from="Timer" to="." method="spawn_car"]

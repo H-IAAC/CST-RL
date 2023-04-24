@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=3 uid="uid://ddedjg6pcvykn"]
+
+[ext_resource type="Script" path="res://scenes/scripts/RequestTest.gd" id="1_w0fyg"]
+
+[node name="RequestTest" type="Node2D"]
+script = ExtResource("1_w0fyg")
+
+[node name="GetTest" type="Button" parent="."]
+offset_left = 128.0
+offset_top = 32.0
+offset_right = 296.0
+offset_bottom = 112.0
+text = "Get Test"
+
+[node name="TypeTest" type="Button" parent="."]
+offset_left = 392.0
+offset_top = 32.0
+offset_right = 568.0
+offset_bottom = 112.0
+text = "Type Test
+"
+
+[node name="PostTest" type="Button" parent="."]
+offset_left = 664.0
+offset_top = 32.0
+offset_right = 832.0
+offset_bottom = 112.0
+text = "Post Test"
+
+[node name="TestText" type="RichTextLabel" parent="."]
+offset_left = 64.0
+offset_top = 192.0
+offset_right = 896.0
+offset_bottom = 384.0
+bbcode_enabled = true
+text = "[center]Make a request!"
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]

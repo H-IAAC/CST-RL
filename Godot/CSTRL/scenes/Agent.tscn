@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://cbhg21w26sb6u"]
+
+[ext_resource type="Script" path="res://scenes/scripts/Agent.gd" id="1_61xc1"]
+[ext_resource type="Texture2D" uid="uid://dbla8k0orng1o" path="res://sprites/agent.png" id="1_tvt7y"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_oakpv"]
+radius = 16.0
+
+[node name="Agent" type="Area2D"]
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("1_61xc1")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_tvt7y")
+
+[node name="Hitbox" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_oakpv")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
+[connection signal="area_entered" from="." to="." method="get_hit"]
