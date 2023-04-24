@@ -9,10 +9,9 @@ import java.util.ArrayList;
 abstract public class RLCodelet extends Codelet {
     protected ArrayList<Double> past_state;
     protected ArrayList<Double> past_action;
-    protected Double past_reward;
 
     protected ArrayList<Double> current_state;
-    protected Double current_reward;
+    protected Double reward;
 
     private MemoryObject RLPerceptMO;
     private MemoryObject RLActionMO;
@@ -37,31 +36,28 @@ abstract public class RLCodelet extends Codelet {
     public void proc() {
         RLPercept percept = (RLPercept) RLPerceptMO.getI();
 
-        past_state = current_state;
-        past_reward = current_reward;
-
         current_state = percept.getState();
-        current_reward = percept.getReward();
 
         if (past_state != null) {
+            reward = percept.getReward();
             runRLStep();
-
-            if (percept.getEnded()) {
-                newEpisode();
-            }
         }
 
         past_action = selectAction();
         RLActionMO.setI(past_action);
+
+        if (percept.getEnded()) {
+            newEpisode();
+        } else {
+            past_state = current_state;
+        }
     }
 
 
     protected void newEpisode() {
         past_state = null;
-        past_reward = null;
         past_action = null;
         current_state = null;
-        current_reward = null;
     }
 
     // Update step for the RL algoritm

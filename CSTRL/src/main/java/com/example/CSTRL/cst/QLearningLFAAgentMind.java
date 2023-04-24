@@ -18,20 +18,14 @@ import java.util.Arrays;
 
 public class QLearningLFAAgentMind extends AgentMind {
 
-    final double initialEpsilon;
-    final int episodesToZeroEpsilon;
-    final double initialAlpha;
-    final int episodesToZeroAlpha;
-    final double discountRate;
+    final double initialEpsilon = 0.2;
+    final int episodesToZeroEpsilon = 100;
+    final double initialAlpha = 0.0001;
+    final int episodesToZeroAlpha = 30;
+    final double discountRate = 0.9;
 
-    public QLearningLFAAgentMind(double initialEpsilon, int episodesToZeroEpsilon, double initialAlpha, int episodesToZeroAlpha, double discountRate) {
+    public QLearningLFAAgentMind() {
         super();
-
-        this.initialEpsilon = initialEpsilon;
-        this.episodesToZeroEpsilon = episodesToZeroEpsilon;
-        this.initialAlpha = initialAlpha;
-        this.episodesToZeroAlpha = episodesToZeroAlpha;
-        this.discountRate = discountRate;
     }
 
     @Override

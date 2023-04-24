@@ -24,7 +24,7 @@ public class StateActionValueFunctionRLCodelet extends RLCodelet {
 
     @Override
     protected void runRLStep() {
-        stateActionValueFunction.update(past_state, past_action, current_state, current_reward, actionManager);
+        stateActionValueFunction.update(past_state, past_action, current_state, reward, actionManager);
     }
 
     @Override

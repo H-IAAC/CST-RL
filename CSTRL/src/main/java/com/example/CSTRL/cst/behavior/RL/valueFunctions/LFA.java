@@ -50,5 +50,6 @@ public class LFA extends StateActionValueFunction {
         for (int i = 0; i < w.size(); i++) {
             w.set(i, w.get(i) + delta * x.get(i));
         }
+        System.out.println(w);
     }
 }
