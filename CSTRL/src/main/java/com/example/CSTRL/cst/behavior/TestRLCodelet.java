@@ -5,7 +5,7 @@ import br.unicamp.cst.core.entities.MemoryObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class TestRLCodelet extends RLCodelet {
+public class TestRLCodelet extends EpisodicRLCodelet {
     private Double t = 0.0;
     private Double mod = 0.1;
 

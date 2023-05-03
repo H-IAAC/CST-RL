@@ -42,8 +42,8 @@ public class LFA extends StateActionValueFunction {
     }
 
     @Override
-    public void update(ArrayList<Double> past_state, ArrayList<Double> past_action, ArrayList<Double> state, Double reward, ActionManager actionManager) {
-        ArrayList<Double> x = featureExtractor.extractFeatures(past_state, past_action);
+    public void update(ArrayList<Double> pastState, ArrayList<Double> pastAction, ArrayList<Double> state, Double reward, ActionManager actionManager) {
+        ArrayList<Double> x = featureExtractor.extractFeatures(pastState, pastAction);
         ArrayList<Double> nx = featureExtractor.extractFeatures(state, actionManager.getBestAction(state, this));
 
         double delta = explorationRate.getRate() * (reward + discountRate * dotProduct(nx, w) - dotProduct(x, w));

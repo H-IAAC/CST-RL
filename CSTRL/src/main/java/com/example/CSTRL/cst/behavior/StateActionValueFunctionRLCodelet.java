@@ -8,7 +8,7 @@ import com.example.CSTRL.cst.behavior.RL.valueFunctions.StateActionValueFunction
 
 import java.util.ArrayList;
 
-public class StateActionValueFunctionRLCodelet extends RLCodelet {
+public class StateActionValueFunctionRLCodelet extends EpisodicRLCodelet {
 
     ActionManager actionManager;
     ActionSelector actionSelector;
@@ -24,12 +24,12 @@ public class StateActionValueFunctionRLCodelet extends RLCodelet {
 
     @Override
     protected void runRLStep() {
-        stateActionValueFunction.update(past_state, past_action, current_state, reward, actionManager);
+        stateActionValueFunction.update(pastState, pastAction, currentState, reward, actionManager);
     }
 
     @Override
     protected ArrayList<Double> selectAction() {
-        return actionSelector.selectAction(current_state, stateActionValueFunction, actionManager);
+        return actionSelector.selectAction(currentState, stateActionValueFunction, actionManager);
     }
 
     @Override

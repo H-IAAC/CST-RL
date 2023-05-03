@@ -17,7 +17,7 @@ public abstract class StateActionValueFunction extends RLElement {
 
     public abstract Double getValue(ArrayList<Double> state, ArrayList<Double> action);
 
-    public abstract void update(ArrayList<Double> past_state, ArrayList<Double> past_action, ArrayList<Double> state, Double reward, ActionManager actionManager);
+    public abstract void update(ArrayList<Double> pastState, ArrayList<Double> pastAction, ArrayList<Double> state, Double reward, ActionManager actionManager);
 
     @Override
     public void endEpisode() {
