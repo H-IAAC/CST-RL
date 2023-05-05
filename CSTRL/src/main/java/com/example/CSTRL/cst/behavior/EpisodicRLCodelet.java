@@ -14,4 +14,12 @@ public abstract class EpisodicRLCodelet extends RLCodelet {
             newEpisode();
         }
     }
+
+    protected void newEpisode() {
+        pastState = null;
+        pastAction = null;
+        currentState = null;
+
+        stepCounter = 0;
+    }
 }

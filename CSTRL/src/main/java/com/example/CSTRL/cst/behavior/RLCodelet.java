@@ -56,15 +56,6 @@ abstract public class RLCodelet extends Codelet {
         endStep(percept.getEnded());
     }
 
-
-    protected void newEpisode() {
-        pastState = null;
-        pastAction = null;
-        currentState = null;
-        
-        stepCounter = 0;
-    }
-
     // Update step for the RL algoritm
     abstract protected void runRLStep();
 
