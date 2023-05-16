@@ -56,7 +56,7 @@ abstract public class RLCodelet extends Codelet {
         endStep(percept.getEnded());
     }
 
-    // Update step for the RL algoritm
+    // Update step for the RL algorithm
     abstract protected void runRLStep();
 
     // Returns the action that should be taken in this step
