@@ -18,6 +18,6 @@ public class LinearDecreaseRLRate extends RLRate {
 
     @Override
     public Double getRate() {
-        return a - Math.min(1.0, totalEpisodes / (double) episodesToZero);
+        return a * (1 - Math.min(1.0, totalEpisodes / (double) episodesToZero));
     }
 }

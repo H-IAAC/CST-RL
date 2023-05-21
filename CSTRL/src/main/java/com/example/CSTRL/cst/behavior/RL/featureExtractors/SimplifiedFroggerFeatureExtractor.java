@@ -2,26 +2,21 @@ package com.example.CSTRL.cst.behavior.RL.featureExtractors;
 
 import java.util.ArrayList;
 
-public class FroggerFeatureExtractor extends TabularFeatureExtractor {
+public class SimplifiedFroggerFeatureExtractor extends TabularFeatureExtractor {
     /*
-        On the continuous Frogger application, the state vector is [x, y, rot, proximity data..., action data...].
+        A feature extractor that considers a simplified version of the experiment. Assumes that the agent only has
+        control over the forwards and backwards motion. As consequence, doesn't consider rotation and x position
+        important. Moreover, the prox_idx, instead of considering the effect of every single proximity index, is defined
+        as 0 if no car is nearby, 1 if a car is in the upper left corner and 2 if a car is in the lower left corner
 
-        We will discretize the values of x, y and rot with a particular precision, and, to minimize the size of our
-        Q-table, we will forego the specific proximity data in favor of a single number that indicates the closest car,
-        as well as the action components in favor of a single action ID.
+        As such, our feature vector will be [y // PY, prox_idx, action_id]
+     */
 
-        As such, our feature vector will be [x // PX, y // PY, rot // PROT, prox_idx, action_id]
-    */
-
-    final int pX;
     final int pY;
-    final int pRot;
     final int proxVectorAmount;
 
-    public FroggerFeatureExtractor(int pX, int pY, int pRot, int proxVectorAmount) {
-        this.pX = pX;
+    public SimplifiedFroggerFeatureExtractor(int pY, int proxVectorAmount) {
         this.pY = pY;
-        this.pRot = pRot;
         this.proxVectorAmount = proxVectorAmount;
     }
 
@@ -30,9 +25,7 @@ public class FroggerFeatureExtractor extends TabularFeatureExtractor {
         ArrayList<Double> features = new ArrayList<>();
 
         // Coordinates
-        features.add(Math.floor(S.get(0) / pX));
         features.add(Math.floor(S.get(1) / pY));
-        features.add(Math.floor(S.get(2) / pRot));
 
         // Proximity index
         Double minProx = 255.0;
@@ -43,6 +36,14 @@ public class FroggerFeatureExtractor extends TabularFeatureExtractor {
                 minProx = S.get(i);
                 proxIdx = i - 2;
             }
+        }
+
+        if (proxIdx > 3 * proxVectorAmount / 4.0) {
+            proxIdx = 1;
+        } else if (proxIdx > proxVectorAmount / 2.0) {
+            proxIdx = 2;
+        } else {
+            proxIdx = 0;
         }
 
         features.add(proxIdx);
@@ -65,6 +66,6 @@ public class FroggerFeatureExtractor extends TabularFeatureExtractor {
 
     @Override
     public int getFeatureVectorSize(int stateSize) {
-        return 4 + proxVectorAmount;
+        return 3;
     }
 }

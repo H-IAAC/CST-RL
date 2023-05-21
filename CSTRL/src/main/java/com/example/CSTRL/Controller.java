@@ -1,9 +1,6 @@
 package com.example.CSTRL;
 
-import com.example.CSTRL.cst.AgentMind;
-import com.example.CSTRL.cst.QLearningAgentMind;
-import com.example.CSTRL.cst.QLearningLFAAgentMind;
-import com.example.CSTRL.cst.TestAgentMind;
+import com.example.CSTRL.cst.*;
 import com.example.CSTRL.util.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +14,7 @@ public class Controller {
     // Initialize
     @GetMapping("/initialize")
     public GodotContainer initialize() {
-        agentMind = new QLearningAgentMind();
+        agentMind = new SimplifiedQLearningAgentMind();
 
         return new GodotContainer(ReturnType.INIT);
     }

@@ -7,26 +7,21 @@ import com.example.CSTRL.cst.behavior.RL.actionManagers.ActionManager;
 import com.example.CSTRL.cst.behavior.RL.actionManagers.DiscreteActionManager;
 import com.example.CSTRL.cst.behavior.RL.actionSelectors.ActionSelector;
 import com.example.CSTRL.cst.behavior.RL.actionSelectors.EpsilonGreedyActionSelector;
-import com.example.CSTRL.cst.behavior.RL.featureExtractors.DirectFeatureExtractor;
-import com.example.CSTRL.cst.behavior.RL.featureExtractors.LCFeatureExtractor;
+import com.example.CSTRL.cst.behavior.RL.featureExtractors.SimplifiedFroggerFeatureExtractor;
 import com.example.CSTRL.cst.behavior.RL.valueFunctions.LFA;
+import com.example.CSTRL.cst.behavior.RL.valueFunctions.QLearning;
 import com.example.CSTRL.cst.behavior.RL.valueFunctions.StateActionValueFunction;
 import com.example.CSTRL.cst.behavior.StateActionValueFunctionRLCodelet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class QLearningLFAAgentMind extends AgentMind {
-
+public class SimplifiedLFAAgentMind extends AgentMind {
     final double initialEpsilon = 0.2;
-    final int episodesToZeroEpsilon = 100;
-    final double initialAlpha = 0.001;
-    final int episodesToZeroAlpha = 100;
+    final int episodesToZeroEpsilon = 50;
+    final double initialAlpha = 0.01;
+    final int episodesToZeroAlpha = 50;
     final double discountRate = 0.9;
-
-    public QLearningLFAAgentMind() {
-        super();
-    }
 
     @Override
     protected Codelet getRLCodelet(MemoryObject perceptMO) {
@@ -34,15 +29,13 @@ public class QLearningLFAAgentMind extends AgentMind {
             {
                 add(new ArrayList<Double>(Arrays.asList(1.0, 0.0, 0.0, 0.0)));
                 add(new ArrayList<Double>(Arrays.asList(0.0, 1.0, 0.0, 0.0)));
-                add(new ArrayList<Double>(Arrays.asList(0.0, 0.0, 1.0, 0.0)));
-                add(new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0, 1.0)));
             }
         };
         ActionManager actionManager = new DiscreteActionManager(actions);
 
         ActionSelector actionSelector = new EpsilonGreedyActionSelector(new LinearDecreaseRLRate(initialEpsilon, episodesToZeroEpsilon));
 
-        StateActionValueFunction stateActionValueFunction = new LFA(new LinearDecreaseRLRate(initialAlpha, episodesToZeroAlpha), discountRate, new DirectFeatureExtractor(), 15);
+        StateActionValueFunction stateActionValueFunction = new LFA(new LinearDecreaseRLRate(initialAlpha, episodesToZeroAlpha), discountRate, new SimplifiedFroggerFeatureExtractor(10, 8), 15);
 
         return new StateActionValueFunctionRLCodelet(perceptMO, actionManager, actionSelector, stateActionValueFunction);
     }

@@ -36,9 +36,13 @@ public class QLearning extends StateActionValueFunction {
     @Override
     public void update(ArrayList<Double> pastState, ArrayList<Double> pastAction, ArrayList<Double> state, Double reward, ActionManager actionManager) {
         String id = tabularFeatureExtractor.getIdentifier(pastState, pastAction);
-        double qValue = getQValue(id);
 
         // Q(St, At) = Q(St, At) + alpha * (Rt+1 + gamma * Q(St+1, A') - Q(St, At))
-        qTable.put(id, qValue + explorationRate.getRate() * (reward + discountRate * getValue(state, actionManager.getBestAction(state, this)) - qValue));
+        double qValue = getQValue(id);
+        double bootstrapValue = reward + discountRate * getValue(state, actionManager.getBestAction(state, this));
+        double newQValue = qValue + explorationRate.getRate() * (bootstrapValue - qValue);
+
+        qTable.put(id, newQValue);
+        System.out.println(id + " : " + getQValue(id).toString());
     }
 }
