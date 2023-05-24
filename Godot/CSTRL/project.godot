@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="CST-RL"
+run/main_scene="res://scenes/Environment.tscn"
 config/features=PackedStringArray("4.0", "Mobile")
 config/icon="res://sprites/agent.png"
 

@@ -41,7 +41,7 @@ abstract public class RLCodelet extends Codelet {
 
         cumulativeRewardData = new ArrayList<>();
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
         LocalDateTime now = LocalDateTime.now();
         creationTime = dtf.format(now);
     }
@@ -100,11 +100,22 @@ abstract public class RLCodelet extends Codelet {
 
     // Saves the data graph. Can be extended in child classes if they want to generate differente graphs
     protected void saveGraphData() {
-        saveGraph(cumulativeRewardData, "graphs/cumulativeRewardData " + creationTime + ".csv");
+        saveGraph(cumulativeRewardData, "C:\\Users\\morai\\OneDrive\\Documentos\\Git\\CST-RL\\CSTRL\\graphs\\cumulativeRewardData-" + creationTime + ".csv");
     }
 
     protected void saveGraph(ArrayList<String[]> data, String outputPath) {
         File csvOutputFile = new File(outputPath);
+
+        if (!csvOutputFile.exists()) {
+            try {
+                csvOutputFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        boolean test = csvOutputFile.exists();
+
         try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
             data.stream()
                 .map(this::convertToCSV)

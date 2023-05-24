@@ -26,7 +26,6 @@ tile_set = SubResource("TileSet_5q6lb")
 format = 2
 
 [node name="Agent" parent="." instance=ExtResource("3_1xwp1")]
-controllable = true
 
 [node name="Cars" type="Node2D" parent="."]
 
@@ -39,4 +38,8 @@ shape = SubResource("RectangleShape2D_1rgyx")
 [node name="Timer" type="Timer" parent="."]
 one_shot = true
 
+[node name="TimeoutTimer" type="Timer" parent="."]
+one_shot = true
+
 [connection signal="timeout" from="Timer" to="." method="spawn_car"]
+[connection signal="timeout" from="TimeoutTimer" to="." method="timeout"]

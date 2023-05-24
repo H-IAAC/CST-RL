@@ -159,3 +159,10 @@ func get_hit(object):
 			reward = environment.get_lose_reward()
 		elif object.get_collision_layer_value(META_COLLISION_LAYER):
 			reward = environment.get_win_reward()
+
+
+func timeout():
+	if not ended:
+		ended = true
+		
+		reward = environment.get_timeout_reward()

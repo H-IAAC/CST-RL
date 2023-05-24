@@ -58,7 +58,7 @@ abstract public class AgentMind extends Mind {
 
         // Define timing
         for (Codelet c : getCodeRack().getAllCodelets()) {
-            c.setTimeStep(10);
+            c.setTimeStep(8);
         }
 
         start();

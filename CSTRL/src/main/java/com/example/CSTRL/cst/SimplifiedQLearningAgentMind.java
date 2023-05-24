@@ -2,6 +2,7 @@ package com.example.CSTRL.cst;
 
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.MemoryObject;
+import com.example.CSTRL.cst.behavior.RL.RLRates.FlatRate;
 import com.example.CSTRL.cst.behavior.RL.RLRates.LinearDecreaseRLRate;
 import com.example.CSTRL.cst.behavior.RL.actionManagers.ActionManager;
 import com.example.CSTRL.cst.behavior.RL.actionManagers.DiscreteActionManager;
@@ -17,10 +18,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SimplifiedQLearningAgentMind extends AgentMind {
-    final double initialEpsilon = 0.2;
-    final int episodesToZeroEpsilon = 5000;
-    final double initialAlpha = 0.001;
-    final int episodesToZeroAlpha = 5000;
+    final double epsilon = 0.2;
+    final double initialAlpha = 0.1;
+    final int episodesToZeroAlpha = 10000;
     final double discountRate = 0.9;
 
     @Override
@@ -33,9 +33,9 @@ public class SimplifiedQLearningAgentMind extends AgentMind {
         };
         ActionManager actionManager = new DiscreteActionManager(actions);
 
-        ActionSelector actionSelector = new EpsilonGreedyActionSelector(new LinearDecreaseRLRate(initialEpsilon, episodesToZeroEpsilon));
+        ActionSelector actionSelector = new EpsilonGreedyActionSelector(new FlatRate(epsilon));
 
-        StateActionValueFunction stateActionValueFunction = new QLearning(new LinearDecreaseRLRate(initialAlpha, episodesToZeroAlpha), discountRate, new SimplifiedFroggerFeatureExtractor(10,8));
+        StateActionValueFunction stateActionValueFunction = new QLearning(new LinearDecreaseRLRate(initialAlpha, episodesToZeroAlpha), discountRate, new SimplifiedFroggerFeatureExtractor(20,8));
 
         return new StateActionValueFunctionRLCodelet(perceptMO, actionManager, actionSelector, stateActionValueFunction);
     }

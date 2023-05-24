@@ -18,9 +18,11 @@ const MIN_CAR_SPAWN_TIME = 1
 const MAX_CAR_SPAWN_TIME = 2.5
 
 const MAX_REWARD = 0.0
-const MIN_REWARD = -0.5
-const WIN_REWARD = 100
-const LOSE_REWARD = -100
+const MIN_REWARD = -1.0
+const WIN_REWARD = 10
+const LOSE_REWARD = -10
+const TIMEOUT_REWARD = -10
+const MAX_TIME = 12
 
 # Tilemap ----------------------------------------------------------------------
 const CELL_SIZE = 64
@@ -51,6 +53,7 @@ const LOWER_TRANSITION_TILE = Vector2i(0, 3)
 @onready var car_container = $Cars
 @onready var agent = $Agent
 @onready var timer = $Timer
+@onready var timeout_timer = $TimeoutTimer
 
 
 # --------------------------------------------------------------------------------------------------
@@ -101,6 +104,7 @@ func initalize_environment():
 func reset():
 	agent.reset_attributes()
 	agent.position = Vector2(CELL_SIZE / 2 + randf() * (h_size - 1) * CELL_SIZE, v_size * CELL_SIZE - CELL_SIZE / 2)
+	timeout_timer.start(MAX_TIME)
 	
 	for car in car_container.get_children():
 		car.queue_free()
@@ -117,7 +121,7 @@ func clamp_agent():
 # Spawns a car in a random valid position
 func spawn_car():
 	var new_car = CAR.instantiate()
-	new_car.position = Vector2(-CELL_SIZE, 1.5 * CELL_SIZE + randf() * (CELL_SIZE * (v_size - 3)))
+	new_car.position = Vector2(-3 * CELL_SIZE, 1.5 * CELL_SIZE + randf() * (CELL_SIZE * (v_size - 3)))
 	car_container.add_child(new_car)
 	
 	timer.start(MIN_CAR_SPAWN_TIME + randf() * (MAX_CAR_SPAWN_TIME - MIN_CAR_SPAWN_TIME))
@@ -126,12 +130,12 @@ func spawn_car():
 
 
 func try_delete_car(car):
-	if car.position[0] < -CELL_SIZE or car.position[0] > (h_size + 1) * CELL_SIZE or car.position[1] < -CELL_SIZE or car.position[1] > (v_size + 1) * CELL_SIZE:
+	if car.position[0] > (h_size + 1) * CELL_SIZE:
 		car.queue_free()
 
 
 func get_reward(state):
-	return state[1] / -1080 * (MAX_REWARD - MIN_REWARD) + MIN_REWARD
+	return state[1] / -(v_size * CELL_SIZE) * (MAX_REWARD - MIN_REWARD) + MAX_REWARD
 
 
 func get_win_reward():
@@ -140,3 +144,11 @@ func get_win_reward():
 
 func get_lose_reward():
 	return LOSE_REWARD
+
+
+func get_timeout_reward():
+	return TIMEOUT_REWARD
+
+
+func timeout():
+	agent.timeout()
