@@ -15,6 +15,8 @@ public class SimplifiedLFAFeatureExtractor extends FeatureExtractor {
 
     final int proxVectorAmount;
 
+    final double maxY = 576;
+
     public SimplifiedLFAFeatureExtractor(int proxVectorAmount) {
         this.proxVectorAmount = proxVectorAmount;
     }
@@ -24,7 +26,7 @@ public class SimplifiedLFAFeatureExtractor extends FeatureExtractor {
         ArrayList<Double> features = new ArrayList<>();
 
         // Coordinates
-        features.add(S.get(1));
+        features.add(S.get(1) / maxY);
 
         // Proximity index
         Double minProx = 255.0;
@@ -38,9 +40,9 @@ public class SimplifiedLFAFeatureExtractor extends FeatureExtractor {
         }
 
         if (proxIdx > 3 * proxVectorAmount / 4.0) {
-            proxIdx = 1;
+            proxIdx = 0.5;
         } else if (proxIdx > proxVectorAmount / 2.0) {
-            proxIdx = 2;
+            proxIdx = 1;
         } else {
             proxIdx = 0;
         }
