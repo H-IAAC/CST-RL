@@ -11,6 +11,7 @@ public class LFA extends StateActionValueFunction {
     FeatureExtractor featureExtractor;
     ArrayList<Double> w;
 
+
     public LFA(RLRate explorationRate, Double discountRate, FeatureExtractor featureExtractor, int stateActionSize) {
         super(explorationRate, discountRate);
 
@@ -19,7 +20,7 @@ public class LFA extends StateActionValueFunction {
         w = new ArrayList<Double>();
         Random r = new Random();
         for (int i = 0; i < featureExtractor.getFeatureVectorSize(stateActionSize); i++) {
-            w.add(r.nextDouble());
+            w.add(r.nextDouble() / 10);
         }
     }
 
@@ -46,10 +47,21 @@ public class LFA extends StateActionValueFunction {
         ArrayList<Double> x = featureExtractor.extractFeatures(pastState, pastAction);
         ArrayList<Double> nx = featureExtractor.extractFeatures(state, actionManager.getBestAction(state, this));
 
+        // x St
+        // at
+        // Rt
+        // nx vetor de features da melhor ação em St+1
+
+        String snx = dotProduct(nx, w).toString();
+        String sx = dotProduct(x, w).toString();
+
+        System.out.println("***\nRt = " + reward.toString() + "; Q_nx = " + snx + "; Q_x = " + sx + "\nx = " + x.toString() + "; nx = " + nx.toString() + "\nw = " + w.toString());
+
+
         double delta = explorationRate.getRate() * (reward + discountRate * dotProduct(nx, w) - dotProduct(x, w));
+
         for (int i = 0; i < w.size(); i++) {
             w.set(i, w.get(i) + delta * x.get(i));
         }
-        System.out.println(w);
     }
 }

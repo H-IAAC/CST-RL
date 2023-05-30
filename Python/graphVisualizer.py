@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-name = "secondExperiment"
+name = "fourthExperiment"
 
 data = np.loadtxt(open(f"CSTRL/graphs/{name}.csv"), delimiter=",")
 

@@ -18,9 +18,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SimplifiedQLearningAgentMind extends AgentMind {
-    final double epsilon = 0.2;
-    final double initialAlpha = 0.1;
-    final int episodesToZeroAlpha = 10000;
+    final double initialEpsilon = 1.0;
+    final int episodesToZeroEpsilon = 20000;
+    final double initialAlpha = 0.05;
+    final int episodesToZeroAlpha = 20000;
     final double discountRate = 0.9;
 
     @Override
@@ -33,9 +34,9 @@ public class SimplifiedQLearningAgentMind extends AgentMind {
         };
         ActionManager actionManager = new DiscreteActionManager(actions);
 
-        ActionSelector actionSelector = new EpsilonGreedyActionSelector(new FlatRate(epsilon));
+        ActionSelector actionSelector = new EpsilonGreedyActionSelector(new LinearDecreaseRLRate(initialEpsilon, episodesToZeroEpsilon));
 
-        StateActionValueFunction stateActionValueFunction = new QLearning(new LinearDecreaseRLRate(initialAlpha, episodesToZeroAlpha), discountRate, new SimplifiedFroggerFeatureExtractor(20,8));
+        StateActionValueFunction stateActionValueFunction = new QLearning(new LinearDecreaseRLRate(initialAlpha, episodesToZeroAlpha), discountRate, new SimplifiedFroggerFeatureExtractor(10,8));
 
         return new StateActionValueFunctionRLCodelet(perceptMO, actionManager, actionSelector, stateActionValueFunction);
     }

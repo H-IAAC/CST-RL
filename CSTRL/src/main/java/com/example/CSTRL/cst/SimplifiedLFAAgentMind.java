@@ -7,9 +7,8 @@ import com.example.CSTRL.cst.behavior.RL.actionManagers.ActionManager;
 import com.example.CSTRL.cst.behavior.RL.actionManagers.DiscreteActionManager;
 import com.example.CSTRL.cst.behavior.RL.actionSelectors.ActionSelector;
 import com.example.CSTRL.cst.behavior.RL.actionSelectors.EpsilonGreedyActionSelector;
-import com.example.CSTRL.cst.behavior.RL.featureExtractors.SimplifiedFroggerFeatureExtractor;
+import com.example.CSTRL.cst.behavior.RL.featureExtractors.SimplifiedLFAFeatureExtractor;
 import com.example.CSTRL.cst.behavior.RL.valueFunctions.LFA;
-import com.example.CSTRL.cst.behavior.RL.valueFunctions.QLearning;
 import com.example.CSTRL.cst.behavior.RL.valueFunctions.StateActionValueFunction;
 import com.example.CSTRL.cst.behavior.StateActionValueFunctionRLCodelet;
 
@@ -17,10 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SimplifiedLFAAgentMind extends AgentMind {
-    final double initialEpsilon = 0.2;
-    final int episodesToZeroEpsilon = 50;
-    final double initialAlpha = 0.01;
-    final int episodesToZeroAlpha = 50;
+    final double initialEpsilon = 0.3;
+    final int episodesToZeroEpsilon = 1500;
+    final double initialAlpha = 0.001;
+    final int episodesToZeroAlpha = 1500;
     final double discountRate = 0.9;
 
     @Override
@@ -35,7 +34,7 @@ public class SimplifiedLFAAgentMind extends AgentMind {
 
         ActionSelector actionSelector = new EpsilonGreedyActionSelector(new LinearDecreaseRLRate(initialEpsilon, episodesToZeroEpsilon));
 
-        StateActionValueFunction stateActionValueFunction = new LFA(new LinearDecreaseRLRate(initialAlpha, episodesToZeroAlpha), discountRate, new SimplifiedFroggerFeatureExtractor(10, 8), 15);
+        StateActionValueFunction stateActionValueFunction = new LFA(new LinearDecreaseRLRate(initialAlpha, episodesToZeroAlpha), discountRate, new SimplifiedLFAFeatureExtractor(8), 15);
 
         return new StateActionValueFunctionRLCodelet(perceptMO, actionManager, actionSelector, stateActionValueFunction);
     }
