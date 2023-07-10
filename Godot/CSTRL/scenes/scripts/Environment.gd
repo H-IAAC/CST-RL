@@ -14,8 +14,8 @@ const MIN_V_SIZE = 5
 const MAX_H_SIZE = 30
 const MAX_V_SIZE = 16
 
-const MIN_CAR_SPAWN_TIME = 1
-const MAX_CAR_SPAWN_TIME = 2.5
+const MIN_CAR_SPAWN_TIME = 1.5
+const MAX_CAR_SPAWN_TIME = 3.0
 
 const MAX_REWARD = 0.0
 const MIN_REWARD = -1.0
@@ -62,6 +62,8 @@ const LOWER_TRANSITION_TILE = Vector2i(0, 3)
 
 
 func _ready():
+	randomize()
+	
 	initalize_environment()
 	reset()
 
@@ -109,8 +111,12 @@ func reset():
 	for car in car_container.get_children():
 		car.queue_free()
 	
-	spawn_car().position[0] = h_size / 2 * CELL_SIZE
-	spawn_car()
+	var base_car = spawn_car()
+	var x = -3 * CELL_SIZE
+	
+	while x < h_size * CELL_SIZE:
+		x += base_car.BASE_SPEED * (MIN_CAR_SPAWN_TIME + randf() * (MAX_CAR_SPAWN_TIME - MIN_CAR_SPAWN_TIME))
+		spawn_car().position[0] = x
 
 
 # Clamps the agent to the keep them on screen

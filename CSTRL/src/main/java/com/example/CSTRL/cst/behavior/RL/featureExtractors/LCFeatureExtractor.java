@@ -13,6 +13,8 @@ public class LCFeatureExtractor extends FeatureExtractor {
 
     @Override
     public ArrayList<Double> extractFeatures(ArrayList<Double> S) {
+        S = normalizeValues(S);
+
         ArrayList<Double> features = new ArrayList<Double>(List.of(1.0));
 
         for (int i = 0; i < S.size(); i++) {
@@ -29,5 +31,10 @@ public class LCFeatureExtractor extends FeatureExtractor {
     @Override
     public int getFeatureVectorSize(int stateSize) {
         return (int) Math.pow(power + 1, stateSize);
+    }
+
+    @Override
+    public ArrayList<ArrayList<Double>> getActionJacobian(ArrayList<Double> S, ArrayList<Double> A) {
+        return null;
     }
 }

@@ -2,13 +2,11 @@ package com.example.CSTRL.cst;
 
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.MemoryObject;
-import com.example.CSTRL.cst.behavior.RL.RLRates.FlatRate;
 import com.example.CSTRL.cst.behavior.RL.RLRates.LinearDecreaseRLRate;
-import com.example.CSTRL.cst.behavior.RL.actionManagers.ActionManager;
-import com.example.CSTRL.cst.behavior.RL.actionManagers.DiscreteActionManager;
+import com.example.CSTRL.cst.behavior.RL.policies.Policy;
+import com.example.CSTRL.cst.behavior.RL.policies.DiscretePolicy;
 import com.example.CSTRL.cst.behavior.RL.actionSelectors.ActionSelector;
 import com.example.CSTRL.cst.behavior.RL.actionSelectors.EpsilonGreedyActionSelector;
-import com.example.CSTRL.cst.behavior.RL.featureExtractors.FroggerFeatureExtractor;
 import com.example.CSTRL.cst.behavior.RL.featureExtractors.SimplifiedFroggerFeatureExtractor;
 import com.example.CSTRL.cst.behavior.RL.valueFunctions.QLearning;
 import com.example.CSTRL.cst.behavior.RL.valueFunctions.StateActionValueFunction;
@@ -32,12 +30,12 @@ public class SimplifiedQLearningAgentMind extends AgentMind {
                 add(new ArrayList<Double>(Arrays.asList(0.0, 1.0, 0.0, 0.0)));
             }
         };
-        ActionManager actionManager = new DiscreteActionManager(actions);
+        Policy policy = new DiscretePolicy(actions);
 
         ActionSelector actionSelector = new EpsilonGreedyActionSelector(new LinearDecreaseRLRate(initialEpsilon, episodesToZeroEpsilon));
 
         StateActionValueFunction stateActionValueFunction = new QLearning(new LinearDecreaseRLRate(initialAlpha, episodesToZeroAlpha), discountRate, new SimplifiedFroggerFeatureExtractor(10,8));
 
-        return new StateActionValueFunctionRLCodelet(perceptMO, actionManager, actionSelector, stateActionValueFunction);
+        return new StateActionValueFunctionRLCodelet(perceptMO, policy, actionSelector, stateActionValueFunction);
     }
 }

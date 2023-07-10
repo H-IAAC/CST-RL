@@ -1,6 +1,7 @@
 package com.example.CSTRL.cst.behavior.RL.featureExtractors;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class SimplifiedLFAFeatureExtractor extends FeatureExtractor {
     /*
@@ -11,6 +12,8 @@ public class SimplifiedLFAFeatureExtractor extends FeatureExtractor {
         also includes a multiplication of the prox_idx by the action_id to account for dependencies between these two
 
         As such, our feature vector will be [y, prox_idx, action_id, prox_idx * action_id]
+
+        NOTE: Trying [y, prox_idx, a_i, a_i * prox_idx]
      */
 
     final int proxVectorAmount;
@@ -23,13 +26,43 @@ public class SimplifiedLFAFeatureExtractor extends FeatureExtractor {
 
     @Override
     public ArrayList<Double> extractFeatures(ArrayList<Double> S) {
+        ArrayList<Double> normalizedS = normalizeValues(S);
         ArrayList<Double> features = new ArrayList<>();
 
         // Coordinates
-        features.add(S.get(1) / maxY);
+        features.add(normalizedS.get(1));
 
         // Proximity index
-        Double minProx = 255.0;
+        double proxIdx = getProxIdx(normalizedS);
+
+        features.add(proxIdx);
+
+        // Action ID
+        //double actionIdx = 0;
+        //double maxActionValue = S.get(3 + proxVectorAmount);
+
+        //for (int i = 4 + proxVectorAmount; i < S.size(); i++) {
+        //    if (S.get(i) > maxActionValue) {
+        //        maxActionValue = S.get(i);
+        //        actionIdx = i - 3 - proxVectorAmount;
+        //    }
+        //}
+
+        //features.add(actionIdx);
+
+        // Action ID * Prox idx
+        //features.add(actionIdx * proxIdx);
+
+        for (int i = 3 + proxVectorAmount; i < normalizedS.size(); i++) {
+            features.add(normalizedS.get(i));
+            features.add(normalizedS.get(i) * proxIdx);
+        }
+
+        return features;
+    }
+
+    private double getProxIdx(ArrayList<Double> S) {
+        Double minProx = Double.POSITIVE_INFINITY;
         double proxIdx = 0;
 
         for (int i = 3; i < 3 + proxVectorAmount; i++) {
@@ -47,29 +80,32 @@ public class SimplifiedLFAFeatureExtractor extends FeatureExtractor {
             proxIdx = 0;
         }
 
-        features.add(proxIdx);
-
-        // Action ID
-        double actionIdx = 0;
-        double maxActionValue = S.get(3 + proxVectorAmount);
-
-        for (int i = 4 + proxVectorAmount; i < S.size(); i++) {
-            if (S.get(i) > maxActionValue) {
-                maxActionValue = S.get(i);
-                actionIdx = i - 3 - proxVectorAmount;
-            }
-        }
-
-        features.add(actionIdx);
-
-        // Action ID * Prox idx
-        features.add(actionIdx * proxIdx);
-
-        return features;
+        return proxIdx;
     }
 
     @Override
     public int getFeatureVectorSize(int stateSize) {
-        return 4;
+        return 2 + 2 * (stateSize - 3 - proxVectorAmount);
+    }
+
+    @Override
+    public ArrayList<ArrayList<Double>> getActionJacobian(ArrayList<Double> S, ArrayList<Double> A) {
+        ArrayList<Double> combinedS = new ArrayList<>(S);
+        combinedS.addAll(A);
+
+        ArrayList<Double> normalizedS = normalizeValues(combinedS);
+
+        ArrayList<ArrayList<Double>> actionJacobian = new ArrayList<>();
+        for (int i = 0; i < A.size(); i++) {
+            actionJacobian.add(new ArrayList<>(Collections.nCopies(getFeatureVectorSize(normalizedS.size()), 0.0)));
+        }
+
+        double proxIdx = getProxIdx(normalizedS);
+        for (int i = 0; i < A.size(); i++) {
+            actionJacobian.get(i).set(2 + 2 * i, 1.0);
+            actionJacobian.get(i).set(2 + 2 * i + 1, proxIdx);
+        }
+
+        return actionJacobian;
     }
 }

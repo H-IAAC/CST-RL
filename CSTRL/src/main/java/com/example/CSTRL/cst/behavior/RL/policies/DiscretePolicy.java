@@ -1,24 +1,24 @@
-package com.example.CSTRL.cst.behavior.RL.actionManagers;
+package com.example.CSTRL.cst.behavior.RL.policies;
 
 import com.example.CSTRL.cst.behavior.RL.valueFunctions.StateActionValueFunction;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-public class DiscreteActionManager extends ActionManager {
+public class DiscretePolicy extends Policy {
     ArrayList<ArrayList<Double>> actionList;
 
-    public DiscreteActionManager(ArrayList<ArrayList<Double>> actionList) {
+    public DiscretePolicy(ArrayList<ArrayList<Double>> actionList) {
         this.actionList = actionList;
     }
 
     @Override
-    public ArrayList<Double> getBestAction(ArrayList<Double> state, StateActionValueFunction stateActionValueFunction) {
+    public ArrayList<Double> getPolicyAction(ArrayList<Double> S, StateActionValueFunction valueFunction) {
         ArrayList<Double> bestAction = new ArrayList<Double>();
         Double bestValue = Double.NEGATIVE_INFINITY;
 
         for (ArrayList<Double> action : actionList) {
-            Double value = stateActionValueFunction.getValue(state, action);
+            Double value = valueFunction.getValue(S, action);
             if (value > bestValue) {
                 bestValue = value;
                 bestAction = action;

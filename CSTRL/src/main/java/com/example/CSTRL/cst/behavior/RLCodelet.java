@@ -2,6 +2,8 @@ package com.example.CSTRL.cst.behavior;
 
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.MemoryObject;
+import com.example.CSTRL.cst.behavior.RL.actionSelectors.ActionSelector;
+import com.example.CSTRL.cst.behavior.RL.actionTranslators.ActionTranslator;
 import com.example.CSTRL.util.RLPercept;
 
 import java.io.File;
@@ -15,6 +17,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 abstract public class RLCodelet extends Codelet {
+    private ActionTranslator actionTranslator;
+
     protected ArrayList<Double> pastState;
     protected ArrayList<Double> pastAction;
 
@@ -75,12 +79,21 @@ abstract public class RLCodelet extends Codelet {
         }
 
         pastAction = selectAction();
-        RLActionMO.setI(pastAction);
+
+        if (actionTranslator != null) {
+            RLActionMO.setI(actionTranslator.translateAction(pastAction));
+        } else {
+            RLActionMO.setI(pastAction);
+        }
 
         pastState = currentState;
         stepCounter++;
 
         endStep(percept.getEnded());
+    }
+
+    public void setActionTranslator(ActionTranslator actionTranslator) {
+        this.actionTranslator = actionTranslator;
     }
 
     // Update step for the RL algorithm

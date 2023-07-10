@@ -67,4 +67,9 @@ public class FroggerFeatureExtractor extends TabularFeatureExtractor {
     public int getFeatureVectorSize(int stateSize) {
         return 4 + proxVectorAmount;
     }
+
+    @Override
+    public ArrayList<ArrayList<Double>> getActionJacobian(ArrayList<Double> S, ArrayList<Double> A) {
+        return null;
+    }
 }

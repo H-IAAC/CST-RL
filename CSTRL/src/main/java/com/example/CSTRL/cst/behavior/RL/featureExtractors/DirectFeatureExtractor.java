@@ -12,4 +12,9 @@ public class DirectFeatureExtractor extends FeatureExtractor {
     public int getFeatureVectorSize(int stateSize) {
         return stateSize;
     }
+
+    @Override
+    public ArrayList<ArrayList<Double>> getActionJacobian(ArrayList<Double> S, ArrayList<Double> A) {
+        return null;
+    }
 }

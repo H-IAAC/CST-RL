@@ -68,4 +68,9 @@ public class SimplifiedFroggerFeatureExtractor extends TabularFeatureExtractor {
     public int getFeatureVectorSize(int stateSize) {
         return 3;
     }
+
+    @Override
+    public ArrayList<ArrayList<Double>> getActionJacobian(ArrayList<Double> S, ArrayList<Double> A) {
+        return null;
+    }
 }

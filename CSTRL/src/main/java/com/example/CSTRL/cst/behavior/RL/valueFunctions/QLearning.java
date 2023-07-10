@@ -1,8 +1,7 @@
 package com.example.CSTRL.cst.behavior.RL.valueFunctions;
 
 import com.example.CSTRL.cst.behavior.RL.RLRates.RLRate;
-import com.example.CSTRL.cst.behavior.RL.actionManagers.ActionManager;
-import com.example.CSTRL.cst.behavior.RL.actionSelectors.ActionSelector;
+import com.example.CSTRL.cst.behavior.RL.policies.Policy;
 import com.example.CSTRL.cst.behavior.RL.featureExtractors.TabularFeatureExtractor;
 
 import java.util.ArrayList;
@@ -34,15 +33,20 @@ public class QLearning extends StateActionValueFunction {
     }
 
     @Override
-    public void update(ArrayList<Double> pastState, ArrayList<Double> pastAction, ArrayList<Double> state, Double reward, ActionManager actionManager) {
+    public void update(ArrayList<Double> pastState, ArrayList<Double> pastAction, ArrayList<Double> state, Double reward, Policy policy) {
         String id = tabularFeatureExtractor.getIdentifier(pastState, pastAction);
 
         // Q(St, At) = Q(St, At) + alpha * (Rt+1 + gamma * Q(St+1, A') - Q(St, At))
         double qValue = getQValue(id);
-        double bootstrapValue = reward + discountRate * getValue(state, actionManager.getBestAction(state, this));
+        double bootstrapValue = reward + discountRate * getValue(state, policy.getPolicyAction(state, this));
         double newQValue = qValue + explorationRate.getRate() * (bootstrapValue - qValue);
 
         qTable.put(id, newQValue);
         System.out.println(id + " : " + getQValue(id).toString());
+    }
+
+    @Override
+    public ArrayList<Double> getActionGradient(ArrayList<Double> S, ArrayList<Double> A) {
+        return null;
     }
 }

@@ -14,7 +14,8 @@ const ANGULAR_ACCEL = 0.5
 
 # Perception -------------------------------------------------------------------
 const TOTAL_RAYCASTS = 8
-const RAYCAST_LENGTH = 256
+const RAYCAST_LENGTH = 350
+const RAYCAST_DISTANCE = 60
 
 # Animation --------------------------------------------------------------------
 const MIN_TURNING_SPEED = 2
@@ -63,15 +64,19 @@ func _ready():
 
 func initialize_proximity_sensors():
 	for i in range(TOTAL_RAYCASTS):
-		var raycast = RayCast2D.new()
-		raycast.target_position = Vector2(0, -RAYCAST_LENGTH).rotated(2 * PI * i / TOTAL_RAYCASTS)
+		raycasts.append([])
 		
-		raycast.collide_with_areas = true
-		raycast.set_collision_mask_value(CAR_COLLISION_LAYER, true)
-		raycast.set_collision_mask_value(META_COLLISION_LAYER, false)
-		add_child(raycast)
-		
-		raycasts.append(raycast)
+		for pos_factor in [-1, 0, 1]:
+			var raycast = RayCast2D.new()
+			raycast.position = pos_factor * Vector2(RAYCAST_DISTANCE, 0).rotated(2 * PI * i / TOTAL_RAYCASTS)
+			raycast.target_position = Vector2(0, -RAYCAST_LENGTH).rotated(2 * PI * i / TOTAL_RAYCASTS)
+			
+			raycast.collide_with_areas = true
+			raycast.set_collision_mask_value(CAR_COLLISION_LAYER, true)
+			raycast.set_collision_mask_value(META_COLLISION_LAYER, false)
+			add_child(raycast)
+			
+			raycasts[i].append(raycast)
 
 
 func _physics_process(delta):
@@ -95,14 +100,23 @@ func perform_action(delta):
 	environment.clamp_agent()
 
 
+func any_raycast_is_colliding(raycast_group):
+	for raycast in raycast_group:
+		if raycast.is_colliding():
+			return true
+	return false
+
+
 func update_state():
 	state = [position[0], position[1], rotation]
 	
-	for raycast in raycasts:
-		if raycast.is_colliding():
-			state.append((raycast.get_collision_point() - position).length())
-		else:
-			state.append(RAYCAST_LENGTH)
+	for raycast_group in raycasts:
+		var min_length = RAYCAST_LENGTH
+		for raycast in raycast_group:
+			if raycast.is_colliding():
+				min_length = min(min_length, (raycast.get_collision_point() - position).length())
+		
+		state.append(min_length)
 	
 	reward = environment.get_reward(state)
 
