@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Synchronous Algorithm Test"
-config/features=PackedStringArray("4.0", "Mobile")
+config/features=PackedStringArray("4.1", "Mobile")
 config/icon="res://resources/sprites/agent.png"
 
 [display]

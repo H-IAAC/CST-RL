@@ -1,7 +1,7 @@
 extends TileMap
 
 
-enum Algorithm {ADP, Q_LEARNING, LFA_Q_LEARNING, SARSA}
+enum Algorithm {ADP, Q_LEARNING, LFA_Q_LEARNING, REINFORCE}
 
 # --------------------------------------------------------------------------------------------------
 # CONSTANTS
@@ -36,6 +36,9 @@ const TILE_TO_ACTION = {
 	Vector2i(0, 2): Vector2i(-1, 0)
 }
 
+const MAX_H = 13
+const MAX_V = 7
+
 # Agent data -------------------------------------------------------------------
 const AGENT_SPRITE_DEFAULT_OFFSET = Vector2(0, -32)
 const AGENT_SPRITE_LERP_WEIGHT = 0.3
@@ -49,7 +52,7 @@ const WIN_REWARD = 1.0
 const LOSE_REWARD = -1.0
 
 # Reinforcement learning -------------------------------------------------------
-const DISCOUNT_RATE = 1
+const DISCOUNT_RATE = 0.9
 
 const POLICY_EVALUATION_MIN_DIF = 0.0001
 
@@ -68,6 +71,9 @@ const LC_POWER = 1
 # Rendering --------------------------------------------------------------------
 const MIN_FRAMES_PER_ITERATION = 1
 const MAX_FRAMES_PER_ITERATION = 60
+
+# Math -------------------------------------------------------------------------
+const e = 2.71828
 
 
 # --------------------------------------------------------------------------------------------------
@@ -98,6 +104,10 @@ var past_reward = null
 # LFA Q-LEARNING
 var w = [0, 0]
 
+# Policy gradient
+var theta = []
+var g = 0
+
 # Rendering --------------------------------------------------------------------
 @export var headless = true
 @export var keep_running = true
@@ -117,6 +127,10 @@ func _ready():
 	w = []
 	for i in range(len(extract_features_lc(Vector2(0, 0), Vector2(1, 0), LC_POWER))):
 		w.append(randf())
+	
+	theta = []
+	for i in range(size_binarized_feature_extractor()):
+		theta.append(randf())
 	
 	initialize_problem()
 	
@@ -258,6 +272,39 @@ func move_agent(action):
 
 
 # --------------------------------------------------------------------------------------------------
+# UTIL
+# --------------------------------------------------------------------------------------------------
+
+func dot(a, b):
+	if len(a) != len(b):
+		push_error("Dot product between vectors of different sizes!")
+	
+	var r = 0
+	for i in range(len(a)):
+		r += a[i] * b[i]
+	
+	return r
+
+
+# --------------------------------------------------------------------------------------------------
+# FEATURE EXTRACTION
+# --------------------------------------------------------------------------------------------------
+
+func binarized_feature_extractor(s, a):
+	var x = Array()
+	x.resize(size_binarized_feature_extractor())
+	x.fill(0)
+	
+	x[(s[0] - 1) * MAX_V * len(ACTION_LIST) + (s[1] - 1) * len(ACTION_LIST) + ACTION_LIST.find(a)] = 1
+	
+	return x
+
+
+func size_binarized_feature_extractor():
+	return MAX_H * MAX_V * len(ACTION_LIST)
+
+
+# --------------------------------------------------------------------------------------------------
 # REINFORCEMENT LEARNING
 # --------------------------------------------------------------------------------------------------
 
@@ -271,6 +318,8 @@ func iterate_algorithm():
 			q_learning_step()
 		Algorithm.LFA_Q_LEARNING:
 			lfa_q_learning()
+		Algorithm.REINFORCE:
+			reinforce_step()
 	
 	iterations += 1
 	if iterations >= MAX_ITERATIONS:
@@ -480,19 +529,12 @@ func get_exploration_rate():
 	return INITIAL_EXPLORATION_RATE * (1 - min(iterations / TOTAL_ITERATIONS_TO_STOP_EXPLORATION, 1))
 
 
-func inner_product(a_1, a_2):
-	var v = 0
-	for i in range(len(a_1)):
-		v += a_1[i] * a_2[i]
-	return v
-
-
 func get_best_action(state):
 	var best_action
 	var best_value = -INF
 	
 	for action in ACTION_LIST:
-		var value = inner_product(w, extract_features_lc(state, action, LC_POWER))
+		var value = dot(w, extract_features_lc(state, action, LC_POWER))
 		
 		if value > best_value:
 			best_value = value
@@ -546,7 +588,7 @@ func lfa_q_learning():
 	# Update parameters --------------------------------------------------------
 	var x = extract_features_lc(s, a, LC_POWER)
 	var nx = extract_features_lc(ns, na, LC_POWER) 
-	var delta = get_exploration_rate() * (r + DISCOUNT_RATE * inner_product(nx, w) - inner_product(x, w))
+	var delta = get_exploration_rate() * (r + DISCOUNT_RATE * dot(nx, w) - dot(x, w))
 	for i in range(len(w)):
 		w[i] += delta * x[i]
 	
@@ -557,6 +599,80 @@ func lfa_q_learning():
 	print(w)
 
 
-#codelet.isMemoryObserver(true)
-#MO.addMemoryObserver(codelet)
-#Roda quando settar o I
+func softmax_prob(s, a):
+	var total = 0
+	for action in ACTION_LIST:
+		total += pow(e, dot(binarized_feature_extractor(s, action), theta))
+	
+	return pow(e, dot(binarized_feature_extractor(s, a), theta)) / total
+
+
+# Returns the gradient of ln(pi(s|a, theta))
+func softmax_gradient(s, a):
+	var xs = []
+	for action in ACTION_LIST:
+		if action != a:
+			xs.append(binarized_feature_extractor(s, action))
+	
+	var gradient = Array()
+	gradient.resize(size_binarized_feature_extractor())
+	gradient.fill(0)
+	
+	for i in range(len(theta)):
+		for x in xs:
+			gradient[i] -= x[i]
+	
+	return gradient
+
+
+func sample_softmax(s):
+	var probs = []
+	var total = 0
+	for action in ACTION_LIST:
+		var action_prob = pow(e, dot(binarized_feature_extractor(s, action), theta))
+		
+		probs.append(action_prob)
+		total += action_prob
+	
+	for i in range(len(probs)):
+		probs[i] /= total
+	
+	var r = randf()
+	for i in range(len(probs)):
+		if r <= probs[i]:
+			return ACTION_LIST[i]
+		r -= probs[i]
+	return ACTION_LIST[-1]
+
+
+func reinforce_step():
+	# Initialize S and A -------------------------------------------------------
+	if len(trial) == 0:
+		move_to(graph.keys()[randi() % len(graph)])
+		
+		g = 0
+	
+	var s = trial[-1]
+	var a = sample_softmax(s)
+	
+	set_cell(OBJECT_LAYER, s, OBJECT_ID, ACTION_TO_TILE[a])
+	
+	# Get S', R ---------------------------------------------------------
+	var ns = get_action_result(s, a)
+	move_to(ns)
+	
+	var r = get_reward(ns)
+	
+	# Update parameters --------------------------------------------------------
+	g = g * DISCOUNT_RATE + r
+	
+	var gradient = softmax_gradient(s, a)
+	var dif = 0
+	for i in range(len(theta)):
+		theta[i] += get_exploration_rate() * g * gradient[i]
+		dif += pow(get_exploration_rate() * g * gradient[i], 2)
+	print(sqrt(dif))
+	
+	# Reset if terminal
+	if is_terminal(ns):
+		trial = []
