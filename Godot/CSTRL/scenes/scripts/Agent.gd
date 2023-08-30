@@ -6,11 +6,8 @@ extends Area2D
 # --------------------------------------------------------------------------------------------------
 
 # Movement ---------------------------------------------------------------------
-const SPEED = 100
+const SPEED = 120
 const ACCEL = 0.2
-
-const ANGULAR_SPEED = PI
-const ANGULAR_ACCEL = 0.5
 
 # Perception -------------------------------------------------------------------
 const TOTAL_RAYCASTS = 8
@@ -30,16 +27,14 @@ const META_COLLISION_LAYER = 2
 
 # Movement ---------------------------------------------------------------------
 var velocity = Vector2(0, 0)
-var angular_velocity = 0.0
-var angle = 0.0
 
 # Perception -------------------------------------------------------------------
 var raycasts = []
 
 # Control ----------------------------------------------------------------------
 @export var controllable = false
-var action_strength = [0.0, 0.0, 0.0, 0.0] # Forward, backward, rot cw, rot ccw
-var state = [] # x, y, rot, proximity data...
+var action_strength = [0.0, 0.0, 0.0, 0.0] # Forward, backward, right, left
+var state = [] # x, y, proximity data...
 var reward = 0 # Reward of current state
 var ended = false # True if experiment has ended
 
@@ -48,7 +43,7 @@ var ended = false # True if experiment has ended
 # --------------------------------------------------------------------------------------------------
 
 @onready var sprite = $Sprite
-@onready var environment = get_parent()
+@onready var environment: RLEnvironment = get_parent() as RLEnvironment
 @onready var http_request = $HTTPRequest
 
 
@@ -81,7 +76,7 @@ func initialize_proximity_sensors():
 
 func _physics_process(delta):
 	if controllable:
-		action_strength = [Input.get_action_strength("move_forward"), Input.get_action_strength("move_backward"), Input.get_action_strength("rot_cw"), Input.get_action_strength("rot_ccw")]
+		action_strength = [Input.get_action_strength("move_up"), Input.get_action_strength("move_down"), Input.get_action_strength("move_right"), Input.get_action_strength("move_left")]
 	
 	if not ended:
 		perform_action(delta)
@@ -89,13 +84,11 @@ func _physics_process(delta):
 
 
 func perform_action(delta):
-	angular_velocity = lerp(angular_velocity, (action_strength[2] - action_strength[3]) * ANGULAR_SPEED, ANGULAR_ACCEL)
-	angle = fmod(angle + angular_velocity * delta, 2 * PI)
-	
-	rotation = angle
-	
-	velocity = lerp(velocity, Vector2(0, -1).rotated(angle) * (action_strength[0] - action_strength[1]) * SPEED, ACCEL)
+	var dir = Vector2(action_strength[2] - action_strength[3], action_strength[1] - action_strength[0]).normalized()
+	velocity = lerp(velocity, dir * SPEED, ACCEL)
 	position += velocity * delta
+	
+	sprite.rotation = -velocity.angle_to(Vector2(0, -1))
 	
 	environment.clamp_agent()
 
@@ -160,8 +153,6 @@ func receive_request_result(result, response_code, headers, body):
 
 func reset_attributes():
 	velocity = Vector2(0, 0)
-	angular_velocity = 0.0
-	angle = 0.0
 	ended = false
 
 

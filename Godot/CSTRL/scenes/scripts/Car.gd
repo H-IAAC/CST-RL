@@ -6,8 +6,8 @@ extends Area2D
 
 # To completely avoid collisions, we need the time between car spawns to be 
 # screen_h_size / min_car_speed + (car_h_size - screen_h_size) / max_car_speed
-const BASE_SPEED = 120
-const SPEED_DIF = 10
+const BASE_SPEED = 150
+const SPEED_DIF = 0
 
 
 # --------------------------------------------------------------------------------------------------
