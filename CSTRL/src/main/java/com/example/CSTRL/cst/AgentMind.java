@@ -36,20 +36,32 @@ abstract public class AgentMind extends Mind {
 
         // Perception
         PerceptionCodelet perceptionCodelet = new PerceptionCodelet();
+
         perceptionCodelet.addInput(stateMO);
         perceptionCodelet.addOutput(RLPerceptMO);
+
+        perceptionCodelet.setIsMemoryObserver(true);
+        stateMO.addMemoryObserver(perceptionCodelet);
+
         insertCodelet(perceptionCodelet, "PERCEPTION");
 
         // Behavior
         Codelet RLCodelet = getRLCodelet(RLPerceptMO);
+
         RLCodelet.addInput(RLPerceptMO);
         RLCodelet.addOutput(RLActionMO);
+
         insertCodelet(RLCodelet, "BEHAVIOR");
 
         // Motor
         MotorCodelet motorCodelet = new MotorCodelet();
+
         motorCodelet.addInput(RLActionMO);
         motorCodelet.addOutput(actionMO);
+
+        motorCodelet.setIsMemoryObserver(true);
+        RLActionMO.addMemoryObserver(motorCodelet);
+
         insertCodelet(motorCodelet, "MOTOR");
 
         /*

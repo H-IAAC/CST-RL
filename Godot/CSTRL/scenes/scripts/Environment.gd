@@ -19,11 +19,11 @@ const MAX_V_SIZE = 16
 const MIN_CAR_SPAWN_TIME = 1.0
 const MAX_CAR_SPAWN_TIME = 2.0
 
-const MAX_REWARD = 0.0
-const MIN_REWARD = -1.0
+const MAX_REWARD_PER_SEC = 0
+const MIN_REWARD_PER_SEC = -1
 const WIN_REWARD = 10
-const LOSE_REWARD = -10
-const TIMEOUT_REWARD = -10
+const LOSE_REWARD = -1
+const TIMEOUT_REWARD = -12
 const MAX_TIME = 12
 
 # Tilemap ----------------------------------------------------------------------
@@ -65,7 +65,7 @@ const LOWER_TRANSITION_TILE = Vector2i(0, 3)
 
 func _ready():
 	randomize()
-	 
+	
 	initalize_environment()
 	reset()
 
@@ -142,8 +142,8 @@ func try_delete_car(car):
 		car.queue_free()
 
 
-func get_reward(state):
-	return state[1] / -(v_size * CELL_SIZE) * (MAX_REWARD - MIN_REWARD) + MAX_REWARD
+func get_reward(state, delta):
+	return lerp(MAX_REWARD_PER_SEC, MIN_REWARD_PER_SEC, state[1] / (v_size * CELL_SIZE))
 
 
 func get_win_reward():

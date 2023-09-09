@@ -8,8 +8,6 @@ public class PerceptionCodelet extends Codelet {
     private MemoryObject stateMO;
     private MemoryObject perceptMO;
 
-    private int cycleCount = 0;
-    private final int cyclesPerUpdate = 15;
     private boolean lastEnded = false;
 
     @Override
@@ -25,16 +23,6 @@ public class PerceptionCodelet extends Codelet {
 
     @Override
     public void proc() {
-        cycleCount += 1;
-
-        boolean ended = ((RLPercept) stateMO.getI()).getEnded();
-
-        if (cycleCount > cyclesPerUpdate || ended && !lastEnded) {
-            cycleCount = 0;
-
-            perceptMO.setI(stateMO.getI());
-        }
-
-        lastEnded = ended;
+        perceptMO.setI(stateMO.getI());
     }
 }

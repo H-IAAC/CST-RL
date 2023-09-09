@@ -20,11 +20,10 @@ public class QLearning extends StateActionValueFunction {
     }
 
     private Double getQValue(String identifier) {
-        if (qTable.containsKey(identifier)) {
-            return qTable.get(identifier);
+        if (!qTable.containsKey(identifier)) {
+            qTable.put(identifier, Math.random());
         }
-
-        return 0.0;
+        return qTable.get(identifier);
     }
 
     @Override

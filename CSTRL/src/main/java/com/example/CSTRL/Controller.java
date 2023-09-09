@@ -13,33 +13,25 @@ public class Controller {
     // Initialize
     @GetMapping("/initialize")
     public GodotContainer initialize() {
-        agentMind = new SimplifiedLFAAgentMind();
+        agentMind = new QLearningAgentMind();
 
         return new GodotContainer(ReturnType.INIT);
     }
 
-    // Receive percepts
-    @PostMapping("/sendpercept")
-    public GodotContainer receivePercept(@RequestBody RLPercept percept) {
-        if (agentMind != null) {
-            agentMind.setState(percept);
+    // Updates StateMO, runs up to action update, then returns action
+    @PostMapping("/step")
+    public GodotContainer step(@RequestBody RLPercept percept) {
+        if (agentMind == null) {
+            initialize();
         }
+
+        agentMind.setState(percept);
 
         if (percept.getEnded()) {
             return new GodotContainer(ReturnType.RESET);
         }
 
-        return new GodotContainer(ReturnType.PERCEPT);
-    }
-
-    // Send actions
-    @GetMapping("/getaction")
-    public RLAction sendAction() {
-        if (agentMind != null) {
-            return new RLAction(agentMind.getAction());
-        }
-        return new RLAction(new ArrayList<Double>());
-
+        return new RLAction(agentMind.getAction());
     }
 
     // Test get mapping

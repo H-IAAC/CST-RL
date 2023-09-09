@@ -1,8 +1,8 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-name = "cumulativeRewardData-2023-06-13-15-40-25"
-interval = 10
+name = "cumulativeRewardData-2023-09-06-10-41-29"
+interval = 100
 
 data = np.loadtxt(open(f"CSTRL/graphs/{name}.csv"), delimiter=",")
 

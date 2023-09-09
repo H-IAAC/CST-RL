@@ -7,11 +7,11 @@ extends Area2D
 
 # Movement ---------------------------------------------------------------------
 const SPEED = 120
-const ACCEL = 0.2
+const ACCEL = 1.0
 
 # Perception -------------------------------------------------------------------
 const TOTAL_RAYCASTS = 8
-const RAYCAST_LENGTH = 350
+const RAYCAST_LENGTH = 256
 const RAYCAST_DISTANCE = 60
 
 # Animation --------------------------------------------------------------------
@@ -20,6 +20,9 @@ const MIN_TURNING_SPEED = 2
 # Environment ------------------------------------------------------------------
 const CAR_COLLISION_LAYER = 1
 const META_COLLISION_LAYER = 2
+
+# Body
+const MIN_DECISION_PERIOD = 0.2
 
 # --------------------------------------------------------------------------------------------------
 # VARIABLES
@@ -37,6 +40,10 @@ var action_strength = [0.0, 0.0, 0.0, 0.0] # Forward, backward, right, left
 var state = [] # x, y, proximity data...
 var reward = 0 # Reward of current state
 var ended = false # True if experiment has ended
+
+# Body -------------------------------------------------------------------------
+var decision_time = 0
+var waiting_for_request = false
 
 # --------------------------------------------------------------------------------------------------
 # NODES
@@ -80,7 +87,8 @@ func _physics_process(delta):
 	
 	if not ended:
 		perform_action(delta)
-		update_state()
+		update_state(delta)
+	update_mind(delta)
 
 
 func perform_action(delta):
@@ -100,8 +108,8 @@ func any_raycast_is_colliding(raycast_group):
 	return false
 
 
-func update_state():
-	state = [position[0], position[1], rotation]
+func update_state(delta):
+	state = [position[0], position[1]]
 	
 	for raycast_group in raycasts:
 		var min_length = RAYCAST_LENGTH
@@ -111,7 +119,14 @@ func update_state():
 		
 		state.append(min_length)
 	
-	reward = environment.get_reward(state)
+	reward = environment.get_reward(state, delta)
+
+func update_mind(delta=0):
+	decision_time += delta
+	if decision_time >= MIN_DECISION_PERIOD and not waiting_for_request:
+		display_error(http_request.request("http://localhost:8080/step", PackedStringArray(["Content-Type:application/json"]), HTTPClient.METHOD_POST, JSON.stringify({"state": state, "reward": reward, "ended": ended})), "An error occured in the sendpercept HTTP request")
+		waiting_for_request = true
+		decision_time = 0
 
 # --------------------------------------------------------------------------------------------------
 # API
@@ -130,6 +145,8 @@ func initialize_api():
 
 
 func receive_request_result(result, response_code, headers, body):
+	waiting_for_request = false
+	
 	if result != HTTPRequest.RESULT_SUCCESS:
 		push_error("HTTP Request wasn't a success")
 	
@@ -137,19 +154,16 @@ func receive_request_result(result, response_code, headers, body):
 	var body_dict = JSON.parse_string(body_content)
 	
 	match body_dict["type"]:
-		"INIT":
-			display_error(http_request.request("http://localhost:8080/sendpercept", PackedStringArray(["Content-Type:application/json"]), HTTPClient.METHOD_POST, JSON.stringify({"state": state, "reward": reward, "ended": ended})), "An error occured in the sendpercept HTTP request")
 		"ACTION":
 			action_strength = body_dict["action"]
-			display_error(http_request.request("http://localhost:8080/sendpercept", PackedStringArray(["Content-Type:application/json"]), HTTPClient.METHOD_POST, JSON.stringify({"state": state, "reward": reward, "ended": ended})), "An error occured in the sendpercept HTTP request")
-		"PERCEPT":
-			display_error(http_request.request("http://localhost:8080/getaction"), "An error occured in the getaction HTTP request")
 		"RESET":
 			environment.reset()
-			update_state()
-			display_error(http_request.request("http://localhost:8080/sendpercept", PackedStringArray(["Content-Type:application/json"]), HTTPClient.METHOD_POST, JSON.stringify({"state": state, "reward": reward, "ended": ended})), "An error occured in the sendpercept HTTP request")
+			update_state(0)
+	
+	update_mind()
 
 # --------------------------------------------------------------------------------------------------
+
 
 func reset_attributes():
 	velocity = Vector2(0, 0)

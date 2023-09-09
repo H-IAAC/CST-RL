@@ -16,10 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class QLearningAgentMind extends AgentMind {
-    final double initialEpsilon = 0.2;
-    final int episodesToZeroEpsilon = 100;
-    final double initialAlpha = 0.0001;
-    final int episodesToZeroAlpha = 30;
+    final double initialEpsilon = 0.9;
+    final int episodesToZeroEpsilon = 4000;
+    final double initialAlpha = 0.01;
+    final int episodesToZeroAlpha = 4000;
     final double discountRate = 0.9;
 
     public QLearningAgentMind() {
@@ -30,6 +30,7 @@ public class QLearningAgentMind extends AgentMind {
     protected Codelet getRLCodelet(MemoryObject perceptMO) {
         ArrayList<ArrayList<Double>> actions = new ArrayList<ArrayList<Double>>() {
             {
+                add(new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0, 0.0)));
                 add(new ArrayList<Double>(Arrays.asList(1.0, 0.0, 0.0, 0.0)));
                 add(new ArrayList<Double>(Arrays.asList(0.0, 1.0, 0.0, 0.0)));
                 add(new ArrayList<Double>(Arrays.asList(0.0, 0.0, 1.0, 0.0)));
@@ -40,7 +41,7 @@ public class QLearningAgentMind extends AgentMind {
 
         ActionSelector actionSelector = new EpsilonGreedyActionSelector(new LinearDecreaseRLRate(initialEpsilon, episodesToZeroEpsilon));
 
-        StateActionValueFunction stateActionValueFunction = new QLearning(new LinearDecreaseRLRate(initialAlpha, episodesToZeroAlpha), discountRate, new FroggerFeatureExtractor(50, 50, 30, 8));
+        StateActionValueFunction stateActionValueFunction = new QLearning(new LinearDecreaseRLRate(initialAlpha, episodesToZeroAlpha), discountRate, new FroggerFeatureExtractor(8, 15, 15, 64));
 
         return new StateActionValueFunctionRLCodelet(perceptMO, policy, actionSelector, stateActionValueFunction);
     }
