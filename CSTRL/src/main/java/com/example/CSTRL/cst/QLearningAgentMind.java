@@ -17,9 +17,9 @@ import java.util.Arrays;
 
 public class QLearningAgentMind extends AgentMind {
     final double initialEpsilon = 0.9;
-    final int episodesToZeroEpsilon = 4000;
-    final double initialAlpha = 0.01;
-    final int episodesToZeroAlpha = 4000;
+    final int episodesToZeroEpsilon = 15000;
+    final double initialAlpha = 0.1;
+    final int episodesToZeroAlpha = 15000;
     final double discountRate = 0.9;
 
     public QLearningAgentMind() {
@@ -41,7 +41,7 @@ public class QLearningAgentMind extends AgentMind {
 
         ActionSelector actionSelector = new EpsilonGreedyActionSelector(new LinearDecreaseRLRate(initialEpsilon, episodesToZeroEpsilon));
 
-        StateActionValueFunction stateActionValueFunction = new QLearning(new LinearDecreaseRLRate(initialAlpha, episodesToZeroAlpha), discountRate, new FroggerFeatureExtractor(8, 15, 15, 64));
+        StateActionValueFunction stateActionValueFunction = new QLearning(new LinearDecreaseRLRate(initialAlpha, episodesToZeroAlpha), discountRate, new FroggerFeatureExtractor(8, 200, 15, 64));
 
         return new StateActionValueFunctionRLCodelet(perceptMO, policy, actionSelector, stateActionValueFunction);
     }
