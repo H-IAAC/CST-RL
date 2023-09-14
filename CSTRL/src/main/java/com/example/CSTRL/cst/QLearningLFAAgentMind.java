@@ -18,9 +18,9 @@ import java.util.Arrays;
 public class QLearningLFAAgentMind extends AgentMind {
 
     final double initialEpsilon = 0.9;
-    final int episodesToZeroEpsilon = 5000;
+    final int episodesToZeroEpsilon = 4000;
     final double initialAlpha = 0.001;
-    final int episodesToZeroAlpha = 5000;
+    final int episodesToZeroAlpha = 4000;
     final double discountRate = 0.9;
 
     public QLearningLFAAgentMind() {
@@ -31,6 +31,7 @@ public class QLearningLFAAgentMind extends AgentMind {
     protected Codelet getRLCodelet(MemoryObject perceptMO) {
         ArrayList<ArrayList<Double>> actions = new ArrayList<ArrayList<Double>>() {
             {
+                add(new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0, 0.0)));
                 add(new ArrayList<Double>(Arrays.asList(1.0, 0.0, 0.0, 0.0)));
                 add(new ArrayList<Double>(Arrays.asList(0.0, 1.0, 0.0, 0.0)));
                 add(new ArrayList<Double>(Arrays.asList(0.0, 0.0, 1.0, 0.0)));
@@ -41,10 +42,10 @@ public class QLearningLFAAgentMind extends AgentMind {
 
         ActionSelector actionSelector = new EpsilonGreedyActionSelector(new LinearDecreaseRLRate(initialEpsilon, episodesToZeroEpsilon));
 
-        FeatureExtractor featureExtractor = new LFAFroggerFeatureExtractor(8, 4);
-        featureExtractor.setMaxStateValues(new ArrayList<Double>(Arrays.asList(1024.0, 576.0, 6.2832, 350.0, 350.0, 350.0, 350.0, 350.0, 350.0, 350.0, 350.0, 1.0, 1.0, 1.0, 1.0)));
+        FeatureExtractor featureExtractor = new LCFeatureExtractor(1);
+        featureExtractor.setMaxStateValues(new ArrayList<Double>(Arrays.asList(1024.0, 576.0, 256.0, 256.0, 256.0, 256.0, 256.0, 256.0, 256.0, 256.0, 1.0, 1.0, 1.0, 1.0)));
 
-        StateActionValueFunction stateActionValueFunction = new LFA(new LinearDecreaseRLRate(initialAlpha, episodesToZeroAlpha), discountRate, featureExtractor, 15);
+        StateActionValueFunction stateActionValueFunction = new LFA(new LinearDecreaseRLRate(initialAlpha, episodesToZeroAlpha), discountRate, featureExtractor, 14);
 
         return new StateActionValueFunctionRLCodelet(perceptMO, policy, actionSelector, stateActionValueFunction);
     }

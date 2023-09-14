@@ -21,7 +21,7 @@ public class LFA extends StateActionValueFunction {
         w = new ArrayList<Double>();
         Random r = new Random();
         for (int i = 0; i < featureExtractor.getFeatureVectorSize(stateActionSize); i++) {
-            w.add(r.nextDouble() / 10);
+            w.add(r.nextDouble());
         }
     }
 
