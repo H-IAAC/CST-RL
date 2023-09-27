@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2023-09-27T17:09:09.394Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.8.2 Chrome/114.0.5735.289 Electron/25.8.1 Safari/537.36" etag="f9uvgy961TJZXyIQ3VXU" version="21.8.2" type="device">
+<mxfile host="Electron" modified="2023-09-27T17:31:11.938Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.8.2 Chrome/114.0.5735.289 Electron/25.8.1 Safari/537.36" etag="1rQjvBv4YXtNRVE7mmSq" version="21.8.2" type="device">
   <diagram name="Página-1" id="L981XZq5zodmihKbrToB">
     <mxGraphModel dx="875" dy="1693" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -104,7 +104,7 @@
         <mxCell id="ySceeVKdL_UXed-vuoVS-19" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="ySceeVKdL_UXed-vuoVS-17">
           <mxGeometry y="60" width="195" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="ySceeVKdL_UXed-vuoVS-20" value="+ getDomain(): &lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;ArrayList&amp;lt;ArrayList&amp;lt;Double&amp;gt;&amp;gt;&lt;br&gt;+ getSize(): int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="ySceeVKdL_UXed-vuoVS-17">
+        <mxCell id="ySceeVKdL_UXed-vuoVS-20" value="+ getDomain(): &lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;ArrayList&amp;lt;ArrayList&amp;lt;Double&amp;gt;&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="ySceeVKdL_UXed-vuoVS-17">
           <mxGeometry y="68" width="195" height="52" as="geometry" />
         </mxCell>
         <mxCell id="ySceeVKdL_UXed-vuoVS-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;" edge="1" parent="1" source="ySceeVKdL_UXed-vuoVS-21" target="ySceeVKdL_UXed-vuoVS-17">

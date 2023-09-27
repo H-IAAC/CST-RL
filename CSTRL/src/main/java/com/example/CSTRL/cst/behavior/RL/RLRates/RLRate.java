@@ -10,4 +10,8 @@ public abstract class RLRate extends RLElement {
     }
 
     public abstract Double getRate();
+
+    public void endEpisode() {
+        return;
+    }
 }

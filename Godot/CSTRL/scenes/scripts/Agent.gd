@@ -39,7 +39,7 @@ var raycasts = []
 var action_strength = [0.0, 0.0, 0.0, 0.0] # Forward, backward, right, left
 var state = [] # x, y, proximity data...
 var reward = 0 # Reward of current state
-var ended = false # True if experiment has ended
+var terminal = false # True if experiment has ended
 
 # Body -------------------------------------------------------------------------
 var decision_time = 0
@@ -85,7 +85,7 @@ func _physics_process(delta):
 	if controllable:
 		action_strength = [Input.get_action_strength("move_up"), Input.get_action_strength("move_down"), Input.get_action_strength("move_right"), Input.get_action_strength("move_left")]
 	
-	if not ended:
+	if not terminal:
 		perform_action(delta)
 		update_state(delta)
 	update_mind(delta)
@@ -124,7 +124,7 @@ func update_state(delta):
 func update_mind(delta=0):
 	decision_time += delta
 	if decision_time >= MIN_DECISION_PERIOD and not waiting_for_request:
-		display_error(http_request.request("http://localhost:8080/step", PackedStringArray(["Content-Type:application/json"]), HTTPClient.METHOD_POST, JSON.stringify({"state": state, "reward": reward, "ended": ended})), "An error occured in the sendpercept HTTP request")
+		display_error(http_request.request("http://localhost:8080/step", PackedStringArray(["Content-Type:application/json"]), HTTPClient.METHOD_POST, JSON.stringify({"state": state, "reward": reward, "terminal": terminal})), "An error occured in the sendpercept HTTP request")
 		waiting_for_request = true
 		decision_time = 0
 
@@ -167,12 +167,12 @@ func receive_request_result(result, response_code, headers, body):
 
 func reset_attributes():
 	velocity = Vector2(0, 0)
-	ended = false
+	terminal = false
 
 
 func get_hit(object):
-	if not ended:
-		ended = true
+	if not terminal:
+		terminal = true
 		
 		if object.get_collision_layer_value(CAR_COLLISION_LAYER):
 			reward = environment.get_lose_reward()
@@ -181,7 +181,7 @@ func get_hit(object):
 
 
 func timeout():
-	if not ended:
-		ended = true
+	if not terminal:
+		terminal = true
 		
 		reward = environment.get_timeout_reward()

@@ -4,8 +4,6 @@ import com.example.CSTRL.cst.*;
 import com.example.CSTRL.util.*;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-
 @RestController
 public class Controller {
     private AgentMind agentMind;
@@ -27,7 +25,7 @@ public class Controller {
 
         agentMind.setState(percept);
 
-        if (percept.getEnded()) {
+        if (percept.isTerminal()) {
             return new GodotContainer(ReturnType.RESET);
         }
 

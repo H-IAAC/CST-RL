@@ -1,37 +1,34 @@
 package com.example.CSTRL.cst.behavior;
 
 import br.unicamp.cst.core.entities.MemoryObject;
+import com.example.CSTRL.cst.behavior.RL.actionSpaces.ActionSpace;
+import com.example.CSTRL.cst.behavior.RL.learners.RLLearner;
 
-public abstract class EpisodicRLCodelet extends RLCodelet {
+import java.util.ArrayList;
+
+public class EpisodicRLCodelet extends RLCodelet {
 
     private final int episodesPerSave = 2;
     private int episodeCounter = 0;
 
-    public EpisodicRLCodelet(MemoryObject perceptMO) {
-        super(perceptMO);
+    public EpisodicRLCodelet(RLLearner learner, ActionSpace actionSpace, MemoryObject perceptMO) {
+        super(learner, actionSpace, perceptMO);
     }
 
     @Override
-    public void endStep(boolean episodeEnded) {
-        if (episodeEnded) {
+    public void endStep(boolean terminal) {
+        if (terminal) {
             episodeCounter += 1;
             addGraphDataPoint(Integer.toString(episodeCounter));
-
             if (episodeCounter % episodesPerSave == 0) {
                 saveGraphData();
             }
 
-            newEpisode();
+            stepCounter = 0;
+            cumulativeReward = 0;
+            learner.endEpisode();
+
+            trial = new ArrayList<>();
         }
-    }
-
-    protected void newEpisode() {
-        pastState = null;
-        pastAction = null;
-        currentState = null;
-
-        stepCounter = 0;
-
-        cumulativeReward = 0;
     }
 }

@@ -4,7 +4,7 @@ import com.example.CSTRL.cst.behavior.RL.RLElement;
 
 import java.util.ArrayList;
 
-public abstract class FeatureExtractor extends RLElement {
+public abstract class FeatureExtractor {
     private ArrayList<Double> maxStateValues = new ArrayList<>();
 
     public abstract ArrayList<Double> extractFeatures(ArrayList<Double> S);

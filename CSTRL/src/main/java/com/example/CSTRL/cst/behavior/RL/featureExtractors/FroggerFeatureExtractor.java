@@ -64,4 +64,9 @@ public class FroggerFeatureExtractor extends TabularFeatureExtractor {
     public ArrayList<ArrayList<Double>> getActionJacobian(ArrayList<Double> S, ArrayList<Double> A) {
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "FroggerFE";
+    }
 }
