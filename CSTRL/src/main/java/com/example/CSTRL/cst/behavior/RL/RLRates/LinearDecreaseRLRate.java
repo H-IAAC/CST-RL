@@ -20,4 +20,8 @@ public class LinearDecreaseRLRate extends RLRate {
     public Double getRate() {
         return a * (1 - Math.min(1.0, totalEpisodes / (double) episodesToZero));
     }
+
+    public String toString() {
+        return "LinearDecreaseRate(a=" + a.toString() + ", epsToZero=" + String.valueOf(episodesToZero) + ")";
+    }
 }

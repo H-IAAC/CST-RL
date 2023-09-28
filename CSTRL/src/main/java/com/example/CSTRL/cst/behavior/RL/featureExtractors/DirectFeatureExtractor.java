@@ -17,4 +17,9 @@ public class DirectFeatureExtractor extends FeatureExtractor {
     public ArrayList<ArrayList<Double>> getActionJacobian(ArrayList<Double> S, ArrayList<Double> A) {
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "DirectFE";
+    }
 }

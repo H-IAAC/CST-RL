@@ -9,4 +9,9 @@ public class FlatRate extends RLRate {
     public Double getRate() {
         return a;
     }
+
+    @Override
+    public String toString() {
+        return "FlatRate(a=" + a.toString() + ")";
+    }
 }
