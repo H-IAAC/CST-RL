@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-name = "LFAQLearning(alpha=[LinearDecreaseRate(a=0.001, epsToZero=4000)],epsilon=[LinearDecreaseRate(a=0.9, epsToZero=4000)],gamma=[0.9],feature_extractor=[LCFE(power=1)])"
+name = "QLearning(alpha=[LinearDecreaseRate(a=0.1, epsToZero=15000)],epsilon=[LinearDecreaseRate(a=0.9, epsToZero=15000)],gamma=[0.9],feature_extractor=[FroggerFE])"
 interval = 100
 
 data = np.loadtxt(open(f"CSTRL/graphs/{name}.csv"), delimiter=",")

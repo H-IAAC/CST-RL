@@ -11,7 +11,7 @@ public class Controller {
     // Initialize
     @GetMapping("/initialize")
     public GodotContainer initialize() {
-        agentMind = new QLearningLFAAgentMind();
+        agentMind = new QLearningAgentMind();
 
         return new GodotContainer(ReturnType.INIT);
     }

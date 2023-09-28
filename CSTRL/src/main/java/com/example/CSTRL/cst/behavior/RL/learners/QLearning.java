@@ -38,7 +38,6 @@ public class QLearning extends RLLearner {
         double newQValue = qValue + alpha.getRate() * (bootstrapValue - qValue);
 
         qTable.put(id, newQValue);
-        System.out.println(id + " : " + getQValue(id).toString());
     }
 
     @Override
