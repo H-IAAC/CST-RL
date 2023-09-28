@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2023-09-27T17:09:09.394Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.8.2 Chrome/114.0.5735.289 Electron/25.8.1 Safari/537.36" etag="f9uvgy961TJZXyIQ3VXU" version="21.8.2" type="device">
+<mxfile host="Electron" modified="2023-09-27T20:12:31.465Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.8.2 Chrome/114.0.5735.289 Electron/25.8.1 Safari/537.36" etag="iI9XUNWvvFdVFn6sEMM7" version="21.8.2" type="device">
   <diagram name="Página-1" id="L981XZq5zodmihKbrToB">
-    <mxGraphModel dx="875" dy="1693" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1050" dy="1798" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -83,7 +83,7 @@
         <mxCell id="ySceeVKdL_UXed-vuoVS-9" value="+ rlStep(trial: ArrayList&amp;lt;RLPercept&amp;gt;): void&lt;br&gt;+ selectAction(s: ArrayList&amp;lt;Double&amp;gt;, &lt;br&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;as: ActionSpace): &lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;ArrayList&amp;lt;Double&amp;gt;&lt;br&gt;+ endEpisode()" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="ySceeVKdL_UXed-vuoVS-6">
           <mxGeometry y="34" width="240" height="86" as="geometry" />
         </mxCell>
-        <mxCell id="ySceeVKdL_UXed-vuoVS-11" value="&lt;i&gt;RLCodelet&lt;/i&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="ySceeVKdL_UXed-vuoVS-11" value="RLCodelet" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="353.5" y="261" width="200" height="120" as="geometry" />
         </mxCell>
         <mxCell id="ySceeVKdL_UXed-vuoVS-12" value="- learner: RLLearner&lt;br&gt;- actionSpace: ActionSpace&lt;br&gt;- trial: RLPercept" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="ySceeVKdL_UXed-vuoVS-11">
@@ -104,7 +104,7 @@
         <mxCell id="ySceeVKdL_UXed-vuoVS-19" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="ySceeVKdL_UXed-vuoVS-17">
           <mxGeometry y="60" width="195" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="ySceeVKdL_UXed-vuoVS-20" value="+ getDomain(): &lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;ArrayList&amp;lt;ArrayList&amp;lt;Double&amp;gt;&amp;gt;&lt;br&gt;+ getSize(): int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="ySceeVKdL_UXed-vuoVS-17">
+        <mxCell id="ySceeVKdL_UXed-vuoVS-20" value="+ getDomain(): &lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;ArrayList&amp;lt;ArrayList&amp;lt;Double&amp;gt;&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="ySceeVKdL_UXed-vuoVS-17">
           <mxGeometry y="68" width="195" height="52" as="geometry" />
         </mxCell>
         <mxCell id="ySceeVKdL_UXed-vuoVS-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;" edge="1" parent="1" source="ySceeVKdL_UXed-vuoVS-21" target="ySceeVKdL_UXed-vuoVS-17">

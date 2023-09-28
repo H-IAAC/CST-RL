@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-name = "cumulativeRewardData-2023-09-14-00-38-36"
+name = "LFAQLearning(alpha=[LinearDecreaseRate(a=0.001, epsToZero=4000)],epsilon=[LinearDecreaseRate(a=0.9, epsToZero=4000)],gamma=[0.9],feature_extractor=[LCFE(power=1)])"
 interval = 100
 
 data = np.loadtxt(open(f"CSTRL/graphs/{name}.csv"), delimiter=",")
