@@ -160,6 +160,7 @@ func receive_request_result(result, response_code, headers, body):
 			environment.reset()
 			update_state(0)
 	
+	environment.update_headless()
 	update_mind()
 
 # --------------------------------------------------------------------------------------------------

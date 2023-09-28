@@ -45,6 +45,13 @@ const LOWER_TRANSITION_TILE = Vector2i(0, 3)
 @export var h_size = 16
 @export var v_size = 9
 
+# Headless ---------------------------------------------------------------------
+@export var headless = false
+var headless_time = 0
+var headless_episode_time = 0
+var headless_car_time = 0
+var headless_start_time = 0
+
 
 # --------------------------------------------------------------------------------------------------
 # NODES
@@ -67,7 +74,17 @@ func _ready():
 	randomize()
 	
 	initalize_environment()
+	
+	agent.set_physics_process(not headless)
+	if headless:
+		headless_start_time = Time.get_unix_time_from_system()
+	
 	reset()
+
+
+func _physics_process(delta):
+	if headless:
+		headless_time += delta
 
 
 # --------------------------------------------------------------------------------------------------
@@ -106,9 +123,16 @@ func initalize_environment():
 
 # Sets the player to a random position on the bottom of the map and spawns cars
 func reset():
+	if headless:
+		var current_time = Time.get_unix_time_from_system()
+		print("Resetting - Emulated time = %.2f" % headless_episode_time + "s, Actual time = %.2fs" % (current_time - headless_start_time))
+		headless_start_time = current_time
+		headless_episode_time = 0
+	
 	agent.reset_attributes()
 	agent.position = Vector2(CELL_SIZE / 2 + randf() * (h_size - 1) * CELL_SIZE, v_size * CELL_SIZE - CELL_SIZE / 2)
-	timeout_timer.start(MAX_TIME)
+	if not headless:
+		timeout_timer.start(MAX_TIME)
 	
 	for car in car_container.get_children():
 		car.queue_free()
@@ -131,8 +155,11 @@ func spawn_car():
 	var new_car = CAR.instantiate()
 	new_car.position = Vector2(-3 * CELL_SIZE, 1.5 * CELL_SIZE + randf() * (CELL_SIZE * (v_size - 3)))
 	car_container.add_child(new_car)
+	new_car.set_physics_process(not headless)
 	
-	timer.start(MIN_CAR_SPAWN_TIME + randf() * (MAX_CAR_SPAWN_TIME - MIN_CAR_SPAWN_TIME))
+	headless_car_time = MIN_CAR_SPAWN_TIME + randf() * (MAX_CAR_SPAWN_TIME - MIN_CAR_SPAWN_TIME)
+	if not headless:
+		timer.start(headless_car_time)
 	
 	return new_car
 
@@ -147,16 +174,47 @@ func get_reward(state, delta):
 
 
 func get_win_reward():
+	if headless:
+		print("---------- Win! ----------")
 	return WIN_REWARD
 
 
 func get_lose_reward():
+	if headless:
+		print("---------- Car hit! ----------")
 	return LOSE_REWARD
 
 
 func get_timeout_reward():
+	if headless:
+		print("---------- Timeout! ----------")
 	return TIMEOUT_REWARD
 
 
 func timeout():
 	agent.timeout()
+
+
+func update_headless():
+	if headless:
+		headless_time = max(agent.MIN_DECISION_PERIOD, headless_time)
+		
+		for car in car_container.get_children():
+			car._physics_process(headless_time)
+		
+		var old_overlaps = agent.get_overlapping_areas()
+		agent._physics_process(headless_time)
+		var new_overlaps = agent.get_overlapping_areas()
+		
+		for no in new_overlaps:
+			if not no in old_overlaps:
+				agent.get_hit(no)
+		
+		headless_episode_time += headless_time
+		headless_car_time -= headless_time
+		headless_time = 0
+		
+		if headless_car_time <= 0:
+			spawn_car()
+		if headless_episode_time >= MAX_TIME:
+			timeout()
