@@ -1,4 +1,4 @@
-from tensorforce import Agent, Environment, Runner
+from tensorforce import Agent, Environment
 
 class CustomEnvironment(Environment):
     def __init__(self, states, actions, max_episode_timesteps):
@@ -20,7 +20,7 @@ environment = Environment.create(
     environment='gym', level='CartPole', max_episode_timesteps=500
 )
 fake_environment = CustomEnvironment(environment.states(), environment.actions(), environment.max_episode_timesteps())
-fake_environment.states()
+print(fake_environment.states())
 
 # Instantiate a Tensorforce agent
 agent = Agent.create(
