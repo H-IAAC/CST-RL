@@ -5,12 +5,46 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Flask",
+            "name": "Python: flask_test.py",
             "type": "python",
             "request": "launch",
             "module": "flask",
             "env": {
                 "FLASK_APP": "Python/learning_server/tests/flask_test.py",
+                "FLASK_DEBUG": "1"
+            },
+            "args": [
+                "run",
+                "--no-debugger",
+                "--no-reload"
+            ],
+            "jinja": true,
+            "justMyCode": true
+        },
+        {
+            "name": "Python: learning_server.py",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "Python/learning_server/learning_server.py",
+                "FLASK_DEBUG": "1"
+            },
+            "args": [
+                "run",
+                "--no-debugger",
+                "--no-reload"
+            ],
+            "jinja": true,
+            "justMyCode": true
+        },
+        {
+            "name": "Python: remote_k_armed_bandit.py",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "Python/learning_server/tests/remote_k_armed_bandit.py",
                 "FLASK_DEBUG": "1"
             },
             "args": [

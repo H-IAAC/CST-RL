@@ -1,8 +1,8 @@
 from tensorforce import Agent
-
 from flask import Flask
 from flask import request
 import json
+import numpy as np
 
 agent = None
 
@@ -21,13 +21,13 @@ app = Flask(__name__)
 @app.route("/initialize", methods=["POST"])
 def initialize():
     if request.method == "POST":
-        # Declares global var
-        global past_internals
+        # Declares global vars
+        global agent
 
         # Initializes agent based on given configuration
         configuration_dictionary = json.loads(request.data)
         agent = Agent.create(agent=configuration_dictionary)
-        past_internals = agent.initial_internals()
+        reset_episode_vars()
 
         # Returns info
         return {"info": "Agent initialized"}
@@ -53,7 +53,7 @@ def step():
         data = json.loads(request.data) # {"state": [float], "reward": float, "terminal": bool}
         
         # If not the first step, updates episode data
-        if past_state:
+        if past_state != None:
             episode_states.append(past_state)
             episode_actions.append(past_action)
             episode_terminals.append(data["terminal"])
@@ -61,8 +61,9 @@ def step():
             episode_internals.append(past_internals)
 
         # Decision making
-        past_state = data["state"]
+        past_state = np.array(data["state"])
         past_action, past_internals = agent.act(states=past_state, internals=past_internals, independent=True, deterministic=True)
+        effective_past_action = past_action
 
         if data["terminal"]:
             # Updates agent
@@ -74,15 +75,30 @@ def step():
             agent.update()
 
             # Resets episode vars
-            past_state = None
-            past_action = None
-            past_internals = agent.initial_internals()
-
-            episode_states = list()
-            episode_actions = list()
-            episode_terminals = list()
-            episode_rewards = list()
-            episode_internals = list()
+            reset_episode_vars()
+            
 
         # Returns the action the agent should take
-        return {"action": past_action}
+        return {"action": effective_past_action.tolist()}
+    
+
+def reset_episode_vars():
+    global past_state
+    global past_action
+    global past_internals
+
+    global episode_states 
+    global episode_actions 
+    global episode_terminals 
+    global episode_rewards
+    global episode_internals
+
+    past_state = None
+    past_action = None
+    past_internals = agent.initial_internals()
+
+    episode_states = list()
+    episode_actions = list()
+    episode_terminals = list()
+    episode_rewards = list()
+    episode_internals = list()
