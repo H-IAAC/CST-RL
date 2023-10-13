@@ -19,12 +19,15 @@ public class TensorforceLearner extends RLLearner {
 
     private final HttpClient client;
     private final String APIUrl;
+    private final String configPath;
+
 
     private double pastReward;
     private boolean pastTerminal;
     private ArrayList<Double> pastState;
 
     public TensorforceLearner(String configPath, String APIUrl) throws IOException, InterruptedException {
+        this.configPath = configPath;
         this.APIUrl = APIUrl;
         client = HttpClient.newHttpClient();
 
@@ -90,11 +93,16 @@ public class TensorforceLearner extends RLLearner {
             action.add(actionData.getDouble(i));
         }
 
-        return action;
+        return actionSpace.translateAPIAction(action);
     }
 
     @Override
     public void endEpisode() {
 
+    }
+
+    @Override
+    public String toString() {
+        return "TensorforceLearner(configPath=" + configPath + ")";
     }
 }

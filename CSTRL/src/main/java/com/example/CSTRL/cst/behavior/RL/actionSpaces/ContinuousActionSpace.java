@@ -51,4 +51,9 @@ public class ContinuousActionSpace extends ActionSpace {
 
         return action;
     }
+
+    @Override
+    public ArrayList<Double> translateAPIAction(ArrayList<Double> a) {
+        return a;
+    }
 }

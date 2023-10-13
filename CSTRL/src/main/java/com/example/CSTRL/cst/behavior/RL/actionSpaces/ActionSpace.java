@@ -8,4 +8,6 @@ abstract public class ActionSpace {
     public ArrayList<ArrayList<Double>> getDomain() {return domain;}
 
     abstract public ArrayList<Double> getRandomAction();
+
+    abstract public ArrayList<Double> translateAPIAction(ArrayList<Double> a);
 }
