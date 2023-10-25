@@ -22,7 +22,7 @@ class Bandit():
 
 N = 100
 MAX_STEPS = 50
-MAX_EPISODES = 100
+MAX_EPISODES = 500
 
 # Instantiate a Tensorforce agent
 agent = Agent.create(

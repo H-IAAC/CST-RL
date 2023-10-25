@@ -24,8 +24,12 @@ def initialize():
         # Declares global vars
         global agent
 
-        # Initializes agent based on given configuration
+        # Loads configuration and fixes shape formatting
         configuration_dictionary = json.loads(request.data)
+        configuration_dictionary["states"]["shape"] = np.shape(configuration_dictionary["states"]["shape"])
+        configuration_dictionary["actions"]["shape"] = np.shape(configuration_dictionary["actions"]["shape"])
+
+        # Initializes agent based on given configuration
         agent = Agent.create(agent=configuration_dictionary)
         reset_episode_vars()
 
@@ -53,7 +57,7 @@ def step():
         data = json.loads(request.data) # {"state": [float], "reward": float, "terminal": bool}
         
         # If not the first step, updates episode data
-        if past_state != None:
+        if not past_state is None:
             episode_states.append(past_state)
             episode_actions.append(past_action)
             episode_terminals.append(data["terminal"])

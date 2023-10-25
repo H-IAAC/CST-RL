@@ -5,23 +5,15 @@ import br.unicamp.cst.core.entities.MemoryObject;
 import com.example.CSTRL.cst.behavior.EpisodicRLCodelet;
 import com.example.CSTRL.cst.behavior.RL.actionSpaces.ActionSpace;
 import com.example.CSTRL.cst.behavior.RL.actionSpaces.DiscreteActionSpace;
-import com.example.CSTRL.cst.behavior.RL.learners.LFAQLearning;
-import com.example.CSTRL.cst.behavior.RL.featureExtractors.*;
-import com.example.CSTRL.cst.behavior.RLCodelet;
+import com.example.CSTRL.cst.behavior.RL.learners.TensorforceLearner;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class QLearningLFAAgentMind extends AgentMind {
-
-    final double initialAlpha = 0.001;
-    final double initialEpsilon = 0.9;
-    final int episodesToConverge = 5000;
-    final double gamma = 0.9;
-
-    public QLearningLFAAgentMind() {
-        super();
-    }
+public class TensorforceAgentMind extends AgentMind {
+    final String configPath = "C:\\Users\\morai\\OneDrive\\Documentos\\Git\\CST-RL\\CSTRL\\src\\main\\java\\com\\example\\CSTRL\\cst\\behavior\\RL\\configs\\dqn.json";
+    final String APIUrl = "http://127.0.0.1:5000";
 
     @Override
     protected Codelet getRLCodelet(MemoryObject perceptMO) {
@@ -35,10 +27,14 @@ public class QLearningLFAAgentMind extends AgentMind {
             }
         };
         ActionSpace actionSpace = new DiscreteActionSpace(actions);
-        FeatureExtractor featureExtractor = new LCFeatureExtractor(1);
-        featureExtractor.setMaxStateValues(new ArrayList<Double>(Arrays.asList(1024.0, 576.0, 256.0, 256.0, 256.0, 256.0, 256.0, 256.0, 256.0, 256.0, 1.0, 1.0, 1.0, 1.0)));
-        LFAQLearning lfaQLearning = new LFAQLearning(initialAlpha, initialEpsilon, episodesToConverge, gamma, featureExtractor);
 
-        return new EpisodicRLCodelet(lfaQLearning, actionSpace, perceptMO);
+        TensorforceLearner tensorforceLearner;
+        try {
+            tensorforceLearner = new TensorforceLearner(configPath, APIUrl);
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        return new EpisodicRLCodelet(tensorforceLearner, actionSpace, perceptMO);
     }
 }

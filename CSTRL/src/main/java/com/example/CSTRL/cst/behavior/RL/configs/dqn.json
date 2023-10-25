@@ -1,5 +1,5 @@
 {
-  "agent": "tensorforce",
+  "agent": "dqn",
   "states": {"type": "float",
     "shape": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
     "min_value": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
@@ -7,18 +7,7 @@
   "actions": {"type": "int",
     "shape": [0.0],
     "num_values": 5},
-  "memory": 10000,
-  "update": {"unit": "timesteps",
-    "batch_size": 64},
-  "optimizer": {
-    "type": "adam",
-    "learning_rate": 1e-3
-  },
-  "policy": {
-    "network": "auto"
-  },
-  "objective": "policy_gradient",
-  "reward_estimation": {
-    "horizon": 20
-  }
+  "memory": 100000,
+  "batch_size": 64,
+  "learning_rate": 1e-3
 }

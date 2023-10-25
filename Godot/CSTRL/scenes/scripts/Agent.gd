@@ -44,6 +44,7 @@ var terminal = false # True if experiment has ended
 # Body -------------------------------------------------------------------------
 var decision_time = 0
 var waiting_for_request = false
+var accelerating = true
 
 # --------------------------------------------------------------------------------------------------
 # NODES
@@ -93,7 +94,7 @@ func _physics_process(delta):
 
 func perform_action(delta):
 	var dir = Vector2(action_strength[2] - action_strength[3], action_strength[1] - action_strength[0]).normalized()
-	velocity = lerp(velocity, dir * SPEED, ACCEL)
+	velocity = lerp(velocity, dir * SPEED, ACCEL) if accelerating else dir * SPEED
 	position += velocity * delta
 	
 	sprite.rotation = -velocity.angle_to(Vector2(0, -1))

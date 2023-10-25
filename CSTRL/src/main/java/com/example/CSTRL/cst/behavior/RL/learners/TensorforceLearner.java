@@ -20,6 +20,7 @@ public class TensorforceLearner extends RLLearner {
     private final HttpClient client;
     private final String APIUrl;
     private final String configPath;
+    private final String configName;
 
 
     private double pastReward;
@@ -28,6 +29,7 @@ public class TensorforceLearner extends RLLearner {
 
     public TensorforceLearner(String configPath, String APIUrl) throws IOException, InterruptedException {
         this.configPath = configPath;
+        this.configName = configPath.substring(configPath.lastIndexOf("\\") + 1);
         this.APIUrl = APIUrl;
         client = HttpClient.newHttpClient();
 
@@ -61,6 +63,12 @@ public class TensorforceLearner extends RLLearner {
 
     @Override
     public ArrayList<Double> selectAction(ArrayList<Double> s) {
+        if (pastState == null) {
+            pastState = s;
+            pastReward = 0.0;
+            pastTerminal = false;
+        }
+
         if (!s.equals(pastState)) {
             System.out.println("Something's wrong! s is not the state given in rlStep");
         }
@@ -98,11 +106,11 @@ public class TensorforceLearner extends RLLearner {
 
     @Override
     public void endEpisode() {
-
+        pastState = null;
     }
 
     @Override
     public String toString() {
-        return "TensorforceLearner(configPath=" + configPath + ")";
+        return "TensorforceLearner(configPath=" + configName + ")";
     }
 }
