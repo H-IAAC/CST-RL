@@ -1,0 +1,25 @@
+{
+  "agent": "tensorforce",
+  "states": {"type": "float",
+    "shape": [0.0, 0.0, 0.0, 0.0],
+    "min_value": [-4.8, -3.402823466e38, -0.419, -3.402823466e38],
+    "max_value": [4.8, 	3.402823466e38, 0.419, 	3.402823466e38]},
+  "actions": {"type": "int",
+    "shape": [0.0],
+    "num_values": 2},
+  "max_episode_timesteps": 500,
+  "memory": 10000,
+  "update": {"unit": "timesteps",
+    "batch_size": 64},
+  "optimizer": {
+    "type": "adam",
+    "learning_rate": 3e-4
+  },
+  "policy": {
+    "network": "auto"
+  },
+  "objective": "policy_gradient",
+  "reward_estimation": {
+    "horizon": 20
+  }
+}

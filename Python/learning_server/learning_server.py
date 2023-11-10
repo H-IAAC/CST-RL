@@ -81,7 +81,7 @@ def step():
             # Resets episode vars
             reset_episode_vars()
             
-
+        print(f"state - {past_state}, action - {past_action}")
         # Returns the action the agent should take
         return {"action": effective_past_action.tolist()}
     
