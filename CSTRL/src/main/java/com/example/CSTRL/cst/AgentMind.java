@@ -21,14 +21,14 @@ abstract public class AgentMind extends Mind {
         */
 
         // Sensor
-        stateMO = createMemoryObject("STATE", new RLPercept(new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)), 0.0, false));
+        stateMO = createMemoryObject("STATE", new RLPercept(new ArrayList<Double>(), 0.0, false));
 
         // Behavior
-        MemoryObject RLPerceptMO = createMemoryObject("RLPERCEPT", new RLPercept(new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)), 0.0, false));
-        MemoryObject RLActionMO = createMemoryObject("RLACTION", new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0, 0.0)));
+        MemoryObject RLPerceptMO = createMemoryObject("RLPERCEPT", new RLPercept(new ArrayList<Double>(), 0.0, false));
+        MemoryObject RLActionMO = createMemoryObject("RLACTION", new ArrayList<Double>());
 
         // Motor
-        actionMO = createMemoryObject("ACTION", new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0, 0.0)));
+        actionMO = createMemoryObject("ACTION", new ArrayList<Double>());
 
         /*
             INITIALIZE CODELETS

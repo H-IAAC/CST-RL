@@ -24,18 +24,20 @@ public class MotorCodelet extends Codelet {
     public void proc() {
         ArrayList<Double> actionList = (ArrayList<Double>) RLActionMO.getI();
 
-        for (int i = 0; i < actionList.size(); i++) {
-            Double value = actionList.get(i);
+        if (actionList.size() > 0) {
+            for (int i = 0; i < actionList.size(); i++) {
+                Double value = actionList.get(i);
 
-            if (value > 1.0) {
-                value = 1.0;
-            } else if (value < 0.0) {
-                value = 0.0;
+                if (value > 1.0) {
+                    value = 1.0;
+                } else if (value < 0.0) {
+                    value = 0.0;
+                }
+
+                actionList.set(i, value);
             }
 
-            actionList.set(i, value);
+            actionMO.setI(actionList);
         }
-
-        actionMO.setI(actionList);
     }
 }

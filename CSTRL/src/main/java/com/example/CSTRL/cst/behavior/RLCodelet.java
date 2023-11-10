@@ -61,24 +61,26 @@ public class RLCodelet extends Codelet {
 
         // Gets percept
         RLPercept percept = (RLPercept) RLPerceptMO.getI();
-        trial.add(percept);
-        cumulativeReward += percept.getReward();
-        stepCounter++;
+        if (percept.getState().size() > 0) { // Will only act if this MO has been updated at least once
+            trial.add(percept);
+            cumulativeReward += percept.getReward();
+            stepCounter++;
 
-        // Updates RL
-        if (trial.size() > 1) {
-            // The trial given at this point will not have the action for the current state defined
-            learner.rlStep(trial);
+            // Updates RL
+            if (trial.size() > 1) {
+                // The trial given at this point will not have the action for the current state defined
+                learner.rlStep(trial);
+            }
+
+            // Gets action
+            ArrayList<Double> nextAction = learner.selectAction(percept.getState());
+            percept.setAction(nextAction);
+
+            RLActionMO.setI(nextAction);
+
+            // Checks for end of episode
+            endStep(percept.isTerminal());
         }
-
-        // Gets action
-        ArrayList<Double> nextAction = learner.selectAction(percept.getState());
-        percept.setAction(nextAction);
-
-        RLActionMO.setI(nextAction);
-
-        // Checks for end of episode
-        endStep(percept.isTerminal());
     }
     
     // Does any processing that needs to be done at the end of the episode, such as resetting the episode
