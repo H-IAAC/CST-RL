@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-name = "LFAQLearning(alpha=[LinearDecreaseRate(a=0.001, epsToZero=5000)],epsilon=[LinearDecreaseRate(a=0.9, epsToZero=5000)],gamma=[0.9],feature_extractor=[LCFE(power=1)])"
+name = "TensorforceLearner(configPath=tensorforce.json)"
 interval = 100
 
 data = np.loadtxt(open(f"CSTRL/graphs/{name}.csv"), delimiter=",")

@@ -14,7 +14,7 @@ import java.util.Arrays;
 public class QLearningAgentMind extends AgentMind {
     final double initialAlpha = 0.1;
     final double initialEpsilon = 0.9;
-    final int episodesToConverge = 15000;
+    final int episodesToConverge = 20000;
 
     final double gamma = 0.9;
 

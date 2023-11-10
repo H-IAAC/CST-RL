@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class TensorforceAgentMind extends AgentMind {
-    final String configPath = "C:\\Users\\morai\\OneDrive\\Documentos\\Git\\CST-RL\\CSTRL\\src\\main\\java\\com\\example\\CSTRL\\cst\\behavior\\RL\\configs\\dqn.json";
+    final String configPath = "C:\\Users\\morai\\OneDrive\\Documentos\\Git\\CST-RL\\CSTRL\\src\\main\\java\\com\\example\\CSTRL\\cst\\behavior\\RL\\configs\\tensorforce.json";
     final String APIUrl = "http://127.0.0.1:5000";
 
     @Override

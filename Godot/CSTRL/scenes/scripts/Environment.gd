@@ -16,14 +16,14 @@ const MIN_V_SIZE = 5
 const MAX_H_SIZE = 30
 const MAX_V_SIZE = 16
 
-const MIN_CAR_SPAWN_TIME = 1.75
+const MIN_CAR_SPAWN_TIME = 1.0
 const MAX_CAR_SPAWN_TIME = 2.0
 
 const MAX_REWARD_PER_SEC = 0
 const MIN_REWARD_PER_SEC = -1
-const WIN_REWARD = 50
-const LOSE_REWARD = -10
-const TIMEOUT_REWARD = -50
+const WIN_REWARD = 30
+const LOSE_REWARD = -1
+const TIMEOUT_REWARD = -12
 const MAX_TIME = 12
 
 # Tilemap ----------------------------------------------------------------------

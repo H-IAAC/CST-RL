@@ -11,7 +11,7 @@ public class Controller {
     // Initialize
     @GetMapping("/initialize")
     public GodotContainer initialize() {
-        agentMind = new QLearningLFAAgentMind();
+        agentMind = new TensorforceAgentMind();
 
         return new GodotContainer(ReturnType.INIT);
     }
@@ -19,6 +19,7 @@ public class Controller {
     // Updates StateMO, runs up to action update, then returns action
     @PostMapping("/step")
     public GodotContainer step(@RequestBody RLPercept percept) {
+        //long time = System.currentTimeMillis();
         if (agentMind == null) {
             initialize();
         }
@@ -29,6 +30,7 @@ public class Controller {
             return new GodotContainer(ReturnType.RESET);
         }
 
+        //System.out.println((System.currentTimeMillis() - time) / 1000.0);
         return new RLAction(agentMind.getAction());
     }
 

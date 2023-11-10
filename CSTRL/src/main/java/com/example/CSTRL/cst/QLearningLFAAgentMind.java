@@ -16,7 +16,7 @@ public class QLearningLFAAgentMind extends AgentMind {
 
     final double initialAlpha = 0.001;
     final double initialEpsilon = 0.9;
-    final int episodesToConverge = 5000;
+    final int episodesToConverge = 4000;
     final double gamma = 0.9;
 
     public QLearningLFAAgentMind() {
