@@ -13,12 +13,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class TensorforceAgentMind extends AgentMind {
-    final String configPath = "C:\\Users\\morai\\OneDrive\\Documentos\\Git\\CST-RL\\CSTRL\\src\\main\\java\\com\\example\\CSTRL\\cst\\behavior\\RL\\configs\\cartpoleTest.json";
+    final String configPath = "C:\\Users\\morai\\OneDrive\\Documentos\\Git\\CST-RL\\CSTRL\\src\\main\\java\\com\\example\\CSTRL\\cst\\behavior\\RL\\configs\\tensorforce.json";
     final String APIUrl = "http://127.0.0.1:5000";
 
     @Override
     protected Codelet getRLCodelet(MemoryObject perceptMO) {
-        /*
+
         ArrayList<ArrayList<Double>> actions = new ArrayList<ArrayList<Double>>() {
             {
                 add(new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0, 0.0)));
@@ -28,14 +28,15 @@ public class TensorforceAgentMind extends AgentMind {
                 add(new ArrayList<Double>(Arrays.asList(0.0, 0.0, 0.0, 1.0)));
             }
         };
-        */
 
+        /*
         ArrayList<ArrayList<Double>> actions = new ArrayList<ArrayList<Double>>() {
             {
                 add(new ArrayList<Double>(List.of(0.0)));
                 add(new ArrayList<Double>(List.of(1.0)));
             }
         };
+        */
         ActionSpace actionSpace = new DiscreteActionSpace(actions);
 
         TensorforceLearner tensorforceLearner;

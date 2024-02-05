@@ -41,7 +41,6 @@ for i in range(EPISODES):
         result = step_request(states, reward, terminal)
         result_dict = json.loads(result.text)
         actions = int(result_dict["action"][0])
-        print(actions)
         states, terminal, reward = environment.execute(actions=actions)
 
         cummulative_reward += reward

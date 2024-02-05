@@ -20,7 +20,6 @@ sources/0 = SubResource("TileSetAtlasSource_7pp78")
 
 [node name="Environment" type="Node2D"]
 script = ExtResource("1_uob20")
-headless = true
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = SubResource("TileSet_5q6lb")
