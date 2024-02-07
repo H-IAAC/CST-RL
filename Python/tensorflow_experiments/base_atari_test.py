@@ -219,3 +219,13 @@ for _ in range(num_iterations):
     avg_return = compute_avg_return(eval_env, agent.policy, num_eval_episodes)
     print('step = {0}: Average Return = {1}'.format(step, avg_return))
     returns.append(avg_return)
+
+#################
+# Visualization #
+#################
+iterations = range(0, num_iterations + 1, eval_interval)
+plt.plot(iterations, returns)
+plt.ylabel('Average Return')
+plt.xlabel('Iterations')
+plt.ylim(top=250)
+plt.show()
