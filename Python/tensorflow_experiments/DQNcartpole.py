@@ -51,6 +51,21 @@ def compute_avg_return(environment, policy, num_episodes=10):
   return avg_return.numpy()[0]
 
 
+"""
+Creates video from policy through the given number of episodes
+"""
+def create_policy_eval_video(policy, filename, num_episodes=5, fps=30):
+  filename = filename + ".mp4"
+  with imageio.get_writer(filename, fps=fps) as video:
+    for _ in range(num_episodes):
+      time_step = eval_env.reset()
+      video.append_data(eval_py_env.render())
+      while not time_step.is_last():
+        action_step = policy.action(time_step)
+        time_step = eval_env.step(action_step.action)
+        video.append_data(eval_py_env.render())
+
+
 # See also the metrics module for standard implementations of different metrics.
 # https://github.com/tensorflow/agents/tree/master/tf_agents/metrics
 
@@ -229,3 +244,5 @@ plt.ylabel('Average Return')
 plt.xlabel('Iterations')
 plt.ylim(top=250)
 plt.show()
+
+create_policy_eval_video(agent.policy, "Python/tensorflow_experiments/videos/DQNCartpole")
