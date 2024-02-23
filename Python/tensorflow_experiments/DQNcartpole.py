@@ -75,7 +75,6 @@ def create_policy_eval_video(policy, filename, num_episodes=5, fps=30):
 ###################
 # Hyperparameters #
 ###################
-print("Hi")
 num_iterations = 20000 
 
 initial_collect_steps = 100  
@@ -132,6 +131,8 @@ q_net = sequential.Sequential(dense_layers + [q_values_layer])
 optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
 train_step_counter = tf.Variable(0)
+
+print(f"Timestep spec - {train_env.time_step_spec()}")
 
 agent = dqn_agent.DqnAgent(
     train_env.time_step_spec(),
