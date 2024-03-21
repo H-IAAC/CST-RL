@@ -133,6 +133,7 @@ optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 train_step_counter = tf.Variable(0)
 
 print(f"Timestep spec - {train_env.time_step_spec()}")
+print(f"Action spec - {train_env.action_spec()}")
 
 agent = dqn_agent.DqnAgent(
     train_env.time_step_spec(),
@@ -196,6 +197,7 @@ iterator = iter(dataset)
 ############
 # Training #
 ############
+
 # (Optional) Optimize by wrapping some of the code in a graph using TF function.
 agent.train = common.function(agent.train)
 

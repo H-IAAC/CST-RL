@@ -97,7 +97,24 @@ def create_policy_eval_video(policy, filename, num_episodes=2, fps=30):
 # Set up a virtual display for rendering OpenAI gym environments.
 #display = pyvirtualdisplay.Display(visible=0, size=(1400, 900)).start()
 
+########
+# GPUs #
+########
+
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+  try:
+    # Currently, memory growth needs to be the same across GPUs
+    for gpu in gpus:
+      tf.config.experimental.set_memory_growth(gpu, True)
+    logical_gpus = tf.config.list_logical_devices('GPU')
+    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+  except RuntimeError as e:
+    # Memory growth must be set before GPUs have been initialized
+    print(e)
+
 
 ###################
 # Hyperparameters #
@@ -131,6 +148,7 @@ video_interval = 10000
 #####################
 # Environment setup #
 #####################
+
 env_name = 'ALE/Freeway-v5'
 env = suite_gym.load(env_name, gym_env_wrappers=[AtariWrapper], max_episode_steps=max_training_episode_steps, gym_kwargs={"frameskip":1})
 
@@ -240,6 +258,7 @@ iterator = iter(dataset)
 ############
 # Training #
 ############
+
 # (Optional) Optimize by wrapping some of the code in a graph using TF function.
 agent.train = common.function(agent.train)
 
@@ -272,11 +291,14 @@ for _ in range(num_iterations):
   step = agent.train_step_counter.numpy()
 
   if step % log_interval == 0:
-    print('step = {0}: loss = {1}'.format(step, train_loss))
+    starting_time = time.time()
+    rb_observer.flush()
+
+    print('step = {} : loss = {} : flushed observer in {:.3f}s'.format(step, train_loss, time.time() - starting_time))
 
   if step % eval_interval == 0:
     avg_return = compute_avg_return(eval_env, agent.policy, num_eval_episodes)
-    print('step = {0}: Average Return = {1} - Epsilon = {2}'.format(step, avg_return, agent.collect_policy._get_epsilon()))
+    print('step = {0} : Average Return = {1} : Epsilon = {2}'.format(step, avg_return, agent.collect_policy._get_epsilon()))
     returns.append(avg_return)
   
   if step % video_interval == 0:
