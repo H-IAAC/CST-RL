@@ -1,6 +1,6 @@
 from tensorforce import Agent, Environment
 import numpy as np
-from graphCreator import Grapher
+from Python.tensorflow_experiments.graphCreator import Grapher
 
 EPISODES = 1000
 PRINT_INTERVAL = 100

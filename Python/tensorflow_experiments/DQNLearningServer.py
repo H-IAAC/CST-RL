@@ -38,7 +38,7 @@ from tf_agents.trajectories import trajectory
 from tf_agents.specs import tensor_spec
 from tf_agents.utils import common
 
-
+"""
 # See also the metrics module for standard implementations of different metrics.
 # https://github.com/tensorflow/agents/tree/master/tf_agents/metrics
 
@@ -222,6 +222,7 @@ plt.ylim(top=250)
 plt.show()
 
 create_policy_eval_video(agent.policy, "Python/tensorflow_experiments/videos/DQNCartpole")
+"""
 
 ###################################################################################################################################################################
 ###################################################################################################################################################################
@@ -236,27 +237,43 @@ class DummyEnv(PyEnvironment):
         self.reward_range = (0.0, 1.0)
         self.discount = discount
 
-        self.obs = np.array()
+        self.obs = np.array([0])
         self.reward = 0.0
-        self.next_obs = np.array()
+        self.next_obs = np.array([0])
         self.next_reward = 0.0
+
+        self.past_action = np.array([0])
     
     def set_next_step(self, obs, reward):
         self.next_obs = obs
         self.next_reward = reward
 
-    def step(self, action):
+    def _step(self, action):
+        self.past_action = action
+
         self.obs = self.next_obs
         self.reward = self.next_reward
 
         return self.current_time_step()
     
+    def _reset(self):
+        return self.effective_time_step()
+
     def current_time_step(self) -> TimeStep:
-        return TimeStep(tf.constant([0]),
-                        tf.constant([self.reward]),
-                        tf.constant([self.discount]),
-                        tf.constant([self.obs]))
+        return TimeStep(np.array(0, dtype=np.int32),
+                        np.array(self.reward, dtype=np.float32),
+                        np.array(self.discount, dtype=np.float32),
+                        np.array(self.obs, dtype=np.float32))
+
+    def effective_time_step(self) -> TimeStep:
+        return TimeStep(np.array(0, dtype=np.int32),
+                        np.array(self.next_reward, dtype=np.float32),
+                        np.array(self.discount, dtype=np.float32),
+                        np.array(self.next_obs, dtype=np.float32))
     
+    def observation_spec(self):
+        return self.time_step_spec_val.observation
+
     def time_step_spec(self):
         return self.time_step_spec_val
 
@@ -278,6 +295,7 @@ agent = None
 has_acted = False
 
 collect_driver = None
+iterator = None
 
 app = Flask(__name__)
 
@@ -321,6 +339,7 @@ def initialize():
             "max_size": int
         },
         "discount": float
+        "batch_size": int
     }
     """
     if request.method == "POST":
@@ -335,6 +354,9 @@ def initialize():
 
         global train_env
 
+        global collect_driver
+        global iterator
+
         # Loads configuration
         config_dict = json.loads(request.data)
 
@@ -343,23 +365,26 @@ def initialize():
         ##############
         for field in ["observation", "action"]:
             if field in config_dict:
-                # Fixes shape
-                config_dict[field]["shape"] = np.shape(config_dict[field]["shape"])
+                if config_dict[field]["type"] == "float32":
+                    # Fixes shape
+                    config_dict[field]["shape"] = np.shape(config_dict[field]["shape"])
 
-                # Fixes infinity
-                for val_field in ["mins", "maxs"]:
-                    for i in range(len(config_dict[field][val_field])):
-                        if config_dict[field][val_field][i] == "-inf":
-                            config_dict[field][val_field][i] = -np.inf
-                        elif config_dict[field][val_field][i] == "inf":
-                            config_dict[field][val_field][i] = np.inf
+                    # Fixes infinity
+                    for val_field in ["mins", "maxs"]:
+                        for i in range(len(config_dict[field][val_field])):
+                            if config_dict[field][val_field][i] == "-inf":
+                                config_dict[field][val_field][i] = -np.inf
+                            elif config_dict[field][val_field][i] == "inf":
+                                config_dict[field][val_field][i] = np.inf
+                elif config_dict[field]["type"] == "int64":
+                    config_dict[field]["shape"] = tf.TensorShape([])
 
         #########
         # Specs #
         #########
         time_step_spec = TimeStep(tf.TensorSpec((), dtype=tf.dtypes.int32, name="step_type"),
                                 reward=tf.TensorSpec((), dtype=tf.dtypes.float32, name="reward"),
-                                discount=ts.BoundedTensorSpec((), tf.dtypes.float32, np.array([0.0]), np.array([1.0]), name="discount"),
+                                discount=ts.BoundedTensorSpec((), tf.dtypes.float32, np.array(0.0), np.array(1.0), name="discount"),
                                 observation=ts.BoundedTensorSpec(config_dict["observation"]["shape"], 
                                                                     type_string_to_dtype[config_dict["observation"]["type"]],
                                                                     np.array(config_dict["observation"]["mins"]),
@@ -444,7 +469,7 @@ def initialize():
 
         # Create sampler for agent
         dataset = replay_buffer.as_dataset(num_parallel_calls=3,
-                                           sample_batch_size=batch_size,
+                                           sample_batch_size=config_dict["batch_size"],
                                            num_steps=2).prefetch(3)
         iterator = iter(dataset)
 
@@ -463,7 +488,7 @@ def initialize():
                                             py_tf_eager_policy.PyTFEagerPolicy(
                                             agent.collect_policy, use_tf_function=True),
                                             [rb_observer],
-                                            max_steps=collect_steps_per_iteration)
+                                            max_steps=1)
 
         has_acted = False
 
@@ -473,6 +498,8 @@ def initialize():
 
 @app.route("/step", methods=["POST"])
 def step():
+
+
     """
     Returns the action that should be taken for the given step. Accepts a dictionary of the form:
 
@@ -489,45 +516,24 @@ def step():
         global agent
         global has_acted
 
+        global collect_driver
+        global iterator
+
         # Consumes step data from client
         data = json.loads(request.data) # {"state": [float], "reward": float, "terminal": bool}
 
-        train_env._env.set_next_step(np.array(data["state"]))
+        train_env._env.envs[0].set_next_step(data["state"], data["reward"])
 
-        if not has_acted:
-            train_env._env.step()
-        
-        next_action = agent.policy.action(train_env._env.current_time_step())
-
-        # Returns the action the agent should take
-        return {"action": next_action.numpy().tolist()}
-            
-
-        
-        # Collect a few steps and save to the replay buffer.
-        time_step, _ = collect_driver.run(time_step)
-
-        # Sample a batch of data from the buffer and update the agent's network.
-        experience, unused_info = next(iterator)
-        train_loss = agent.train(experience).loss
-
-        step = agent.train_step_counter.numpy()
-
-        if step % log_interval == 0:
-            print('step = {0}: loss = {1}'.format(step, train_loss))
-
-        if step % eval_interval == 0:
-            avg_return = compute_avg_return(eval_env, agent.policy, num_eval_episodes)
-            print('step = {0}: Average Return = {1}'.format(step, avg_return))
-            returns.append(avg_return)
-
-        # If not the first step, agent can observe the result of its actions
         if has_acted:
-            agent.observe(terminal=data["terminal"], reward=data["reward"])
+            # Collect a few steps and save to the replay buffer.
+            collect_driver.run(train_env.reset())
 
-        # Decision making
-        action = agent.act(states=np.array(data["state"]), independent=data["terminal"])
-        has_acted = not data["terminal"]
+            # Sample a batch of data from the buffer and update the agent's network.
+            experience, unused_info = next(iterator)
+            train_loss = agent.train(experience).loss
+        
+        next_action = train_env._env.envs[0].past_action
+        has_acted = True
 
         # Returns the action the agent should take
-        return {"action": action.tolist()}
+        return {"action": next_action.tolist()}
