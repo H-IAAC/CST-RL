@@ -21,6 +21,7 @@ import reverb
 import tensorflow as tf
 from tensorflow.python.framework import tensor_spec as ts
 
+from tf_agents.trajectories import Trajectory
 from tf_agents.trajectories import TimeStep
 from tf_agents.agents.dqn import dqn_agent
 from tf_agents.drivers import py_driver
@@ -38,248 +39,6 @@ from tf_agents.trajectories import trajectory
 from tf_agents.specs import tensor_spec
 from tf_agents.utils import common
 
-"""
-# See also the metrics module for standard implementations of different metrics.
-# https://github.com/tensorflow/agents/tree/master/tf_agents/metrics
-
-# Set up a virtual display for rendering OpenAI gym environments.
-#display = pyvirtualdisplay.Display(visible=0, size=(1400, 900)).start()
-
-###################
-# Hyperparameters #
-###################
-num_iterations = 20000 
-
-initial_collect_steps = 100  
-collect_steps_per_iteration =   1
-replay_buffer_max_length = 100000  
-
-batch_size = 16
-learning_rate = 1e-3 
-log_interval = 200  
-
-num_eval_episodes = 10  
-eval_interval = 1000  
-
-#####################
-# Environment setup #
-#####################
-env_name = 'CartPole-v0'
-env = suite_gym.load(env_name)
-
-train_py_env = suite_gym.load(env_name) # For training the model
-eval_py_env = suite_gym.load(env_name)  # For evaluating the model
-
-train_env = tf_py_environment.TFPyEnvironment(train_py_env)
-eval_env = tf_py_environment.TFPyEnvironment(eval_py_env)
-
-###############
-# Agent setup #
-###############
-fc_layer_params = (100, 50)
-action_tensor_spec = tensor_spec.from_spec(env.action_spec())
-num_actions = action_tensor_spec.maximum - action_tensor_spec.minimum + 1
-
-# Define a helper function to create Dense layers configured with the right
-# activation and kernel initializer.
-def dense_layer(num_units):
-  return tf.keras.layers.Dense(
-      num_units,
-      activation=tf.keras.activations.relu,
-      kernel_initializer=tf.keras.initializers.VarianceScaling(
-          scale=2.0, mode='fan_in', distribution='truncated_normal'))
-
-# QNetwork consists of a sequence of Dense layers followed by a dense layer
-# with `num_actions` units to generate one q_value per available action as
-# its output.
-dense_layers = [dense_layer(num_units) for num_units in fc_layer_params]
-q_values_layer = tf.keras.layers.Dense(
-    num_actions,
-    activation=None,
-    kernel_initializer=tf.keras.initializers.RandomUniform(
-        minval=-0.03, maxval=0.03),
-    bias_initializer=tf.keras.initializers.Constant(-0.2))
-q_net = sequential.Sequential(dense_layers + [q_values_layer])
-
-optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
-
-train_step_counter = tf.Variable(0)
-
-print(f"Timestep spec - {train_env.time_step_spec()}")
-
-agent = dqn_agent.DqnAgent(
-    train_env.time_step_spec(),
-    train_env.action_spec(),
-    q_network=q_net,
-    optimizer=optimizer,
-    td_errors_loss_fn=common.element_wise_squared_loss,
-    train_step_counter=train_step_counter)
-
-agent.initialize()
-
-##########
-# Policy #
-##########
-random_policy = random_tf_policy.RandomTFPolicy(train_env.time_step_spec(),
-                                                train_env.action_spec())
-
-#################
-# Replay buffer #
-#################
-table_name = 'uniform_table'
-replay_buffer_signature = tensor_spec.from_spec(
-      agent.collect_data_spec)
-replay_buffer_signature = tensor_spec.add_outer_dim(
-    replay_buffer_signature)
-
-table = reverb.Table(
-    table_name,
-    max_size=replay_buffer_max_length,
-    sampler=reverb.selectors.Uniform(),
-    remover=reverb.selectors.Fifo(),
-    rate_limiter=reverb.rate_limiters.MinSize(1),
-    signature=replay_buffer_signature)
-
-reverb_server = reverb.Server([table])
-
-replay_buffer = reverb_replay_buffer.ReverbReplayBuffer(
-    agent.collect_data_spec,
-    table_name=table_name,
-    sequence_length=2,
-    local_server=reverb_server)
-
-rb_observer = reverb_utils.ReverbAddTrajectoryObserver(
-  replay_buffer.py_client,
-  table_name,
-  sequence_length=2)
-
-# Fill replay buffer with random policy experience and create sampler for agent
-py_driver.PyDriver(
-    env,
-    py_tf_eager_policy.PyTFEagerPolicy(
-      random_policy, use_tf_function=True),
-    [rb_observer],
-    max_steps=initial_collect_steps).run(train_py_env.reset())
-dataset = replay_buffer.as_dataset(
-    num_parallel_calls=3,
-    sample_batch_size=batch_size,
-    num_steps=2).prefetch(3)
-iterator = iter(dataset)
-
-############
-# Training #
-############
-print(f"Step example - {eval_env.step([0])}")
-
-# (Optional) Optimize by wrapping some of the code in a graph using TF function.
-agent.train = common.function(agent.train)
-
-# Reset the train step.
-agent.train_step_counter.assign(0)
-
-# Evaluate the agent's policy once before training.
-#avg_return = compute_avg_return(eval_env, agent.policy, num_eval_episodes)
-#returns = [avg_return]
-
-# Reset the environment.
-time_step = train_py_env.reset()
-
-# Create a driver to collect experience.
-collect_driver = py_driver.PyDriver(
-    env,
-    py_tf_eager_policy.PyTFEagerPolicy(
-      agent.collect_policy, use_tf_function=True),
-    [rb_observer],
-    max_steps=collect_steps_per_iteration)
-
-for _ in range(num_iterations):
-
-  # Collect a few steps and save to the replay buffer.
-  time_step, _ = collect_driver.run(time_step)
-
-  # Sample a batch of data from the buffer and update the agent's network.
-  experience, unused_info = next(iterator)
-  train_loss = agent.train(experience).loss
-
-  step = agent.train_step_counter.numpy()
-
-  if step % log_interval == 0:
-    print('step = {0}: loss = {1}'.format(step, train_loss))
-
-  if step % eval_interval == 0:
-    avg_return = compute_avg_return(eval_env, agent.policy, num_eval_episodes)
-    print('step = {0}: Average Return = {1}'.format(step, avg_return))
-    returns.append(avg_return)
-
-#################
-# Visualization #
-#################
-iterations = range(0, num_iterations + 1, eval_interval)
-plt.plot(iterations, returns)
-plt.ylabel('Average Return')
-plt.xlabel('Iterations')
-plt.ylim(top=250)
-plt.show()
-
-create_policy_eval_video(agent.policy, "Python/tensorflow_experiments/videos/DQNCartpole")
-"""
-
-###################################################################################################################################################################
-###################################################################################################################################################################
-###################################################################################################################################################################
-
-class DummyEnv(PyEnvironment):
-    def __init__(self, time_step_spec, action_spec, discount) -> None:
-        super().__init__()
-
-        self.time_step_spec_val = time_step_spec
-        self.action_spec_val = action_spec
-        self.reward_range = (0.0, 1.0)
-        self.discount = discount
-
-        self.obs = np.array([0])
-        self.reward = 0.0
-        self.next_obs = np.array([0])
-        self.next_reward = 0.0
-
-        self.past_action = np.array([0])
-    
-    def set_next_step(self, obs, reward):
-        self.next_obs = obs
-        self.next_reward = reward
-
-    def _step(self, action):
-        self.past_action = action
-
-        self.obs = self.next_obs
-        self.reward = self.next_reward
-
-        return self.current_time_step()
-    
-    def _reset(self):
-        return self.effective_time_step()
-
-    def current_time_step(self) -> TimeStep:
-        return TimeStep(np.array(0, dtype=np.int32),
-                        np.array(self.reward, dtype=np.float32),
-                        np.array(self.discount, dtype=np.float32),
-                        np.array(self.obs, dtype=np.float32))
-
-    def effective_time_step(self) -> TimeStep:
-        return TimeStep(np.array(0, dtype=np.int32),
-                        np.array(self.next_reward, dtype=np.float32),
-                        np.array(self.discount, dtype=np.float32),
-                        np.array(self.next_obs, dtype=np.float32))
-    
-    def observation_spec(self):
-        return self.time_step_spec_val.observation
-
-    def time_step_spec(self):
-        return self.time_step_spec_val
-
-    def action_spec(self):
-        return self.action_spec_val
-
 
 type_string_to_dtype = {
    "float32": tf.dtypes.float32,
@@ -289,12 +48,17 @@ activation_string_to_activation = {
    "relu": tf.keras.activations.relu
 }
 
-train_env = None
+step_count = 0
+batch_size = 0
 
 agent = None
-has_acted = False
 
-collect_driver = None
+discount = 0.0
+past_action = None
+past_state = None
+
+replay_buffer = None
+rb_observer = None
 iterator = None
 
 app = Flask(__name__)
@@ -347,15 +111,16 @@ def initialize():
         # SETUP #
         #########
         # Declares global vars
-        global train_env
+        global step_count
+        global batch_size
 
         global agent
-        global has_acted
+        global past_action
+        global past_state
+        global discount
 
-        global train_env
-
-        global collect_driver
-        global iterator
+        global replay_buffer
+        global rb_observer
 
         # Loads configuration
         config_dict = json.loads(request.data)
@@ -401,9 +166,7 @@ def initialize():
         #####################
         # Environment setup #
         #####################
-        env = DummyEnv(time_step_spec, action_spec, config_dict["discount"])
-        train_py_env = DummyEnv(time_step_spec, action_spec, config_dict["discount"]) # For training the model
-        train_env = tf_py_environment.TFPyEnvironment(train_py_env)
+        discount = config_dict["discount"]
 
         ###############
         # Agent setup #
@@ -418,7 +181,7 @@ def initialize():
                 case _:
                     return {"info": f"Failed to initialize agent - Unrecognized layer type \"{layer_spec['type']}\""}
         
-        action_tensor_spec = tensor_spec.from_spec(env.action_spec())
+        action_tensor_spec = tensor_spec.from_spec(action_spec)
         num_actions = action_tensor_spec.maximum - action_tensor_spec.minimum + 1
         q_values_layer = dense_layer(num_actions, None)
 
@@ -434,8 +197,8 @@ def initialize():
 
         # Initialize agent
         train_step_counter = tf.Variable(0)
-        agent = dqn_agent.DqnAgent(train_env.time_step_spec(),
-                                   train_env.action_spec(),
+        agent = dqn_agent.DqnAgent(time_step_spec,
+                                   action_spec,
                                    q_network=q_net,
                                    optimizer=optimizer,
                                    td_errors_loss_fn=common.element_wise_squared_loss,
@@ -482,15 +245,11 @@ def initialize():
         # Reset the train step
         agent.train_step_counter.assign(0)
 
-        # Create a driver to collect experience.
-        
-        collect_driver = py_driver.PyDriver(env,
-                                            py_tf_eager_policy.PyTFEagerPolicy(
-                                            agent.collect_policy, use_tf_function=True),
-                                            [rb_observer],
-                                            max_steps=1)
+        step_count = 0
+        batch_size = config_dict["batch_size"]
 
-        has_acted = False
+        past_action = None
+        past_state = None
 
         # Returns info
         return {"info": "Agent initialized"}
@@ -498,7 +257,6 @@ def initialize():
 
 @app.route("/step", methods=["POST"])
 def step():
-
 
     """
     Returns the action that should be taken for the given step. Accepts a dictionary of the form:
@@ -511,29 +269,48 @@ def step():
     """
     if request.method == "POST":
         # Declares global vars
-        global train_env
+        global step_count
+        global batch_size
 
         global agent
-        global has_acted
+        global past_action
+        global past_state
+        global discount
 
-        global collect_driver
+        global replay_buffer
+        global rb_observer
         global iterator
 
         # Consumes step data from client
         data = json.loads(request.data) # {"state": [float], "reward": float, "terminal": bool}
 
-        train_env._env.envs[0].set_next_step(data["state"], data["reward"])
+        if not past_state is None:
+            # Adds experience to replay buffer
+            rb_observer(Trajectory(np.array(0, dtype=np.int32),
+                                   np.array(past_state, dtype=np.float32),
+                                   np.array(past_action),
+                                   (),
+                                   np.array(0, dtype=np.int32),
+                                   np.array(data["reward"], dtype=np.float32),
+                                   np.array(discount, dtype=np.float32)))
+            
+            step_count += 1
 
-        if has_acted:
-            # Collect a few steps and save to the replay buffer.
-            collect_driver.run(train_env.reset())
-
-            # Sample a batch of data from the buffer and update the agent's network.
-            experience, unused_info = next(iterator)
-            train_loss = agent.train(experience).loss
+            if step_count == batch_size: # Create dataset and iterator once rb is filled enough
+                dataset = replay_buffer.as_dataset(num_parallel_calls=3,
+                                            sample_batch_size=batch_size,
+                                            num_steps=2).prefetch(3)
+                iterator = iter(dataset)
+            
+            if step_count >= batch_size: # Sample a batch of data from the buffer and update the agent's network.
+                experience, unused_info = next(iterator)
+                train_loss = agent.train(experience).loss
         
-        next_action = train_env._env.envs[0].past_action
-        has_acted = True
+        past_action = py_tf_eager_policy.PyTFEagerPolicy(agent.policy, use_tf_function=True).action(TimeStep(np.array(0, dtype=np.int32),
+                                                                                                                np.array(data["reward"], dtype=np.float32),
+                                                                                                                np.array(discount, dtype=np.float32),
+                                                                                                                np.array(data["observation"], dtype=np.float32))).action
+        past_state = data["observation"]
 
         # Returns the action the agent should take
-        return {"action": next_action.tolist()}
+        return {"action": past_action.tolist()}

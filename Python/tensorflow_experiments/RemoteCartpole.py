@@ -8,7 +8,7 @@ import json
 
 def step_request(states, reward, terminal):
     step_info = {
-        "state": states.tolist(),
+        "observation": states.tolist(),
         "reward": reward,
         "terminal": terminal
     }
@@ -45,10 +45,10 @@ TRAINING_PARAMETERS = {
         "learning_rate": 0.001
     },
     "replay_buffer": {
-        "max_size": 1000
+        "max_size": 100000
     },
     "discount": 0.9,
-    "batch_size": 8
+    "batch_size": 64
 }
 
 EPISODES = 1000
@@ -73,7 +73,7 @@ for i in range(EPISODES):
     while not terminal:
         result = step_request(states, reward, terminal)
         result_dict = json.loads(result.text)
-        actions = int(result_dict["action"][0])
+        actions = int(result_dict["action"])
         states, reward, terminal, _ = environment.step(actions)
 
         cummulative_reward += reward

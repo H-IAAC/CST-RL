@@ -233,6 +233,7 @@ for _ in range(num_iterations):
   if step % log_interval == 0:
     print('step = {0}: loss = {1}'.format(step, train_loss))
     pass
+    
 
   if step % eval_interval == 0:
     avg_return = compute_avg_return(eval_env, agent.policy, num_eval_episodes)
