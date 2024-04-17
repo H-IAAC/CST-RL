@@ -50,6 +50,7 @@ activation_string_to_activation = {
 
 step_count = 0
 batch_size = 0
+initial_collect_steps = 0
 
 agent = None
 
@@ -67,8 +68,7 @@ app = Flask(__name__)
 def dense_layer(units, activation):
    return tf.keras.layers.Dense(units,
                                 activation=activation,
-                                kernel_initializer=tf.keras.initializers.RandomUniform(minval=-0.03, maxval=0.03),
-                                bias_initializer=tf.keras.initializers.Constant(-0.2))
+                                kernel_initializer=tf.keras.initializers.VarianceScaling(scale=2.0, mode='fan_in', distribution='truncated_normal'))
 
 
 @app.route("/initialize", methods=["POST"])
@@ -104,6 +104,7 @@ def initialize():
         },
         "discount": float
         "batch_size": int
+        "initial_collect_steps": int
     }
     """
     if request.method == "POST":
@@ -113,6 +114,7 @@ def initialize():
         # Declares global vars
         global step_count
         global batch_size
+        global initial_collect_steps
 
         global agent
         global past_action
@@ -177,14 +179,19 @@ def initialize():
         for layer_spec in config_dict["network"]:
             match layer_spec["type"]:
                 case "dense":
-                    layers.append(dense_layer(layer_spec["units"], activation_string_to_activation[layer_spec["activation"]]))
+                    layers.append(tf.keras.layers.Dense(layer_spec["units"], 
+                                                       activation=activation_string_to_activation[layer_spec["activation"]],
+                                                       kernel_initializer=tf.keras.initializers.VarianceScaling(scale=2.0, mode='fan_in', distribution='truncated_normal')))
                 case _:
                     return {"info": f"Failed to initialize agent - Unrecognized layer type \"{layer_spec['type']}\""}
         
         action_tensor_spec = tensor_spec.from_spec(action_spec)
         num_actions = action_tensor_spec.maximum - action_tensor_spec.minimum + 1
-        q_values_layer = dense_layer(num_actions, None)
-
+        q_values_layer = tf.keras.layers.Dense(num_actions,
+                                               activation=None,
+                                               kernel_initializer=tf.keras.initializers.RandomUniform(minval=-0.03, maxval=0.03),
+                                               bias_initializer=tf.keras.initializers.Constant(-0.2))
+        
         q_net = sequential.Sequential(layers + [q_values_layer])
 
         # Optimizer
@@ -230,12 +237,6 @@ def initialize():
                                                                table_name,
                                                                sequence_length=2)
 
-        # Create sampler for agent
-        dataset = replay_buffer.as_dataset(num_parallel_calls=3,
-                                           sample_batch_size=config_dict["batch_size"],
-                                           num_steps=2).prefetch(3)
-        iterator = iter(dataset)
-
         ############
         # Training #
         ############
@@ -247,6 +248,7 @@ def initialize():
 
         step_count = 0
         batch_size = config_dict["batch_size"]
+        initial_collect_steps = config_dict["initial_collect_steps"]
 
         past_action = None
         past_state = None
@@ -257,9 +259,8 @@ def initialize():
 
 @app.route("/step", methods=["POST"])
 def step():
-
     """
-    Returns the action that should be taken for the given step. Accepts a dictionary of the form:
+    Returns the collect action that should be taken for the given step, training the agent. Accepts a dictionary of the form:
 
     {
         "observation": [float],
@@ -296,17 +297,17 @@ def step():
             
             step_count += 1
 
-            if step_count == batch_size: # Create dataset and iterator once rb is filled enough
+            if step_count == initial_collect_steps: # Create dataset and iterator once rb is filled enough
                 dataset = replay_buffer.as_dataset(num_parallel_calls=3,
                                             sample_batch_size=batch_size,
                                             num_steps=2).prefetch(3)
                 iterator = iter(dataset)
             
-            if step_count >= batch_size: # Sample a batch of data from the buffer and update the agent's network.
+            if step_count >= initial_collect_steps: # Sample a batch of data from the buffer and update the agent's network.
                 experience, unused_info = next(iterator)
                 train_loss = agent.train(experience).loss
         
-        past_action = py_tf_eager_policy.PyTFEagerPolicy(agent.policy, use_tf_function=True).action(TimeStep(np.array(0, dtype=np.int32),
+        past_action = py_tf_eager_policy.PyTFEagerPolicy(agent.collect_policy, use_tf_function=True).action(TimeStep(np.array(0, dtype=np.int32),
                                                                                                                 np.array(data["reward"], dtype=np.float32),
                                                                                                                 np.array(discount, dtype=np.float32),
                                                                                                                 np.array(data["observation"], dtype=np.float32))).action
@@ -314,3 +315,30 @@ def step():
 
         # Returns the action the agent should take
         return {"action": past_action.tolist()}
+
+
+@app.route("/eval", methods=["POST"])
+def eval():
+    """
+    Returns the optimial action that should be taken for the given step without training the agent. Accepts a dictionary of the form:
+
+    {
+        "observation": [float],
+        "reward": float,
+        "terminal": bool
+    }
+    """
+    if request.method == "POST":
+        # Declares global vars
+        global agent
+
+        # Consumes step data from client
+        data = json.loads(request.data) # {"state": [float], "reward": float, "terminal": bool}
+        
+        action = py_tf_eager_policy.PyTFEagerPolicy(agent.policy, use_tf_function=True).action(TimeStep(np.array(0, dtype=np.int32),
+                                                                                                                np.array(data["reward"], dtype=np.float32),
+                                                                                                                np.array(discount, dtype=np.float32),
+                                                                                                                np.array(data["observation"], dtype=np.float32))).action
+
+        # Returns the action the agent should take
+        return {"action": action.tolist()}

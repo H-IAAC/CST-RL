@@ -6,17 +6,51 @@ import requests
 import json
 
 
-def step_request(states, reward, terminal):
+def step_request(states, reward, terminal, eval=False):
     step_info = {
         "observation": states.tolist(),
         "reward": reward,
         "terminal": terminal
     }
 
+    if eval:
+        return requests.post("http://localhost:5000/eval", json=step_info)
     return requests.post("http://localhost:5000/step", json=step_info)
 
 
+def run_episode(env, max_steps, eval=False):
+    """
+    Runs and episode from beginning to end and returns the total reward obatined
+    """
+
+    # Initialize episode
+    states = env.reset()
+    terminal = False
+    reward = 0.0
+
+    cummulative_reward = 0.0
+
+    total_steps = 0
+    while not terminal:
+        result = step_request(states, reward, terminal, eval)
+        result_dict = json.loads(result.text)
+        actions = int(result_dict["action"])
+        states, reward, terminal, _ = env.step(actions)
+
+        if total_steps >= max_steps:
+            terminal = True
+
+        cummulative_reward += reward
+        total_steps += 1
+    
+    if not eval:
+        step_request(states, reward, terminal)
+
+    return cummulative_reward
+
+
 TRAINING_PARAMETERS = {
+
     "observation": {
         "type": "float32",
         "shape": [0, 0, 0, 0],
@@ -48,40 +82,38 @@ TRAINING_PARAMETERS = {
         "max_size": 100000
     },
     "discount": 0.9,
-    "batch_size": 64
+    "batch_size": 64,
+    "initial_collect_steps": 100
 }
 
-EPISODES = 1000
-PRINT_INTERVAL = 10
+EPISODES = 500
+EVAL_INTERVAL = 10
+EVAL_EPISODES = 2
+MAX_STEPS = 200
 
-# Pre-defined or custom environment
-environment = gym.make("CartPole-v1")
+# Initialize environments
+train_env = gym.make("CartPole-v1")
+eval_env = gym.make("CartPole-v1")
 
 # Initialize DQNLearningServer
 info = requests.post("http://localhost:5000/initialize", json=TRAINING_PARAMETERS)
 
-data = np.zeros((EPISODES, 2))
+data = np.zeros((int(EPISODES / EVAL_INTERVAL), 2))
+
 # Train for EPISODES
 for i in range(EPISODES):
-    cummulative_reward = 0.0
+    run_episode(train_env, MAX_STEPS)
 
-    # Initialize episode
-    states = environment.reset()
-    terminal = False
-    reward = 0.0
+    if i % EVAL_INTERVAL == 0:
+        avg_reward = 0.0
+        for j in range(EVAL_EPISODES):
+            avg_reward += run_episode(eval_env, MAX_STEPS, True)
+        avg_reward /= EVAL_EPISODES
 
-    while not terminal:
-        result = step_request(states, reward, terminal)
-        result_dict = json.loads(result.text)
-        actions = int(result_dict["action"])
-        states, reward, terminal, _ = environment.step(actions)
+        print(f"Finished episode {i} - Avg reward {avg_reward}")
+        data[int(i / EVAL_INTERVAL), :] = [int(i / EVAL_INTERVAL), avg_reward]
 
-        cummulative_reward += reward
-    step_request(states, reward, terminal)
-    
-    if i != 0 and i % PRINT_INTERVAL == 0:
-        print(f"Finished running episode number {i}")
-    data[i, :] = [i, cummulative_reward]
+train_env.close()
+eval_env.close()
 
-environment.close()
-Grapher.create("RemoteCartpoleDQN", 50, data)
+Grapher.create("RemoteCartpoleDQN", 5, data)
