@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2023-10-25T14:11:21.009Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="xcorKW3NOs4H-n5r58z4" version="22.0.3" type="device">
+<mxfile host="Electron" modified="2024-04-26T19:24:02.622Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="g9XlzDipccrCZhzBQLqb" version="22.0.3" type="device">
   <diagram name="Página-1" id="L981XZq5zodmihKbrToB">
-    <mxGraphModel dx="2514" dy="2162" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1863" dy="1783" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -128,59 +128,51 @@
         <mxCell id="ySceeVKdL_UXed-vuoVS-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.25;entryY=0;entryDx=0;entryDy=0;endArrow=diamond;endFill=1;" parent="1" source="ySceeVKdL_UXed-vuoVS-20" target="ySceeVKdL_UXed-vuoVS-11" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-1" value="AgentMind" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="-20" y="-90" width="760" height="720" as="geometry" />
+        <mxCell id="29HbRJZK24xHVCOGVFIw-1" value="AgentMind" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-20" y="-90" width="760" height="730" as="geometry" />
         </mxCell>
         <mxCell id="oXIEZwQkRcJTD2ducp0V-1" value="&lt;h1&gt;Synchronicity&lt;/h1&gt;&lt;div&gt;&lt;i&gt;RLCodelet &lt;/i&gt;is registered as a memory observer of the RLPerceptMO. As such, it will run proc() once RLPerceptMO is updated&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="29HbRJZK24xHVCOGVFIw-1" vertex="1">
-          <mxGeometry x="565" y="60" width="190" height="120" as="geometry" />
+          <mxGeometry x="220" y="520" width="170" height="140" as="geometry" />
         </mxCell>
         <mxCell id="oXIEZwQkRcJTD2ducp0V-2" value="&lt;h1&gt;Execution&lt;br&gt;&lt;/h1&gt;&lt;p&gt;The idea here is that the chosen action should keep being performed in the environment until the RL system is ready to make a new choice&lt;br&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="29HbRJZK24xHVCOGVFIw-1" vertex="1">
-          <mxGeometry x="565" y="200" width="190" height="130" as="geometry" />
+          <mxGeometry x="565" y="180" width="190" height="130" as="geometry" />
         </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-18" value="&lt;b&gt;TensorforceLearner&lt;br&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="29HbRJZK24xHVCOGVFIw-1">
-          <mxGeometry x="120" y="540" width="160" height="60" as="geometry" />
+        <mxCell id="29HbRJZK24xHVCOGVFIw-18" value="&lt;b&gt;TensorflowLearner&lt;br&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="29HbRJZK24xHVCOGVFIw-1" vertex="1">
+          <mxGeometry x="40" y="540" width="160" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-24" value="TensorforceAPI" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="29HbRJZK24xHVCOGVFIw-1">
-          <mxGeometry x="100" y="773" width="200" height="80" as="geometry" />
+        <mxCell id="29HbRJZK24xHVCOGVFIw-12" value="Environment" style="whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
+          <mxGeometry x="760" y="220" width="110" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-25" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="29HbRJZK24xHVCOGVFIw-24">
+        <mxCell id="29HbRJZK24xHVCOGVFIw-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;startArrow=none;startFill=0;endArrow=classic;endFill=1;dashed=1;entryX=0.994;entryY=0.491;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="29HbRJZK24xHVCOGVFIw-12" target="-NE6A836NCrnR8vJoupu-24" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="790" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="29HbRJZK24xHVCOGVFIw-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.126;entryY=1.009;entryDx=0;entryDy=0;entryPerimeter=0;endArrow=block;endFill=1;" parent="1" source="29HbRJZK24xHVCOGVFIw-18" target="ySceeVKdL_UXed-vuoVS-9" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="29HbRJZK24xHVCOGVFIw-20" value="&lt;h1&gt;Environment&lt;/h1&gt;&lt;div&gt;In our experiment, it is implemented in Godot. In practice, it can be whatever as long as it communicates with CST through the specified interface&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="890" y="215" width="190" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="29HbRJZK24xHVCOGVFIw-24" value="TensorflowAPI" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-260" y="435" width="200" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="29HbRJZK24xHVCOGVFIw-25" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="29HbRJZK24xHVCOGVFIw-24" vertex="1">
           <mxGeometry y="26" width="200" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-26" value="+ initialize()&lt;br&gt;+ step(percept: RLPercept)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="29HbRJZK24xHVCOGVFIw-24">
-          <mxGeometry y="34" width="200" height="46" as="geometry" />
+        <mxCell id="29HbRJZK24xHVCOGVFIw-26" value="+ initialize()&lt;br&gt;+ step(percept: RLPercept)&lt;br&gt;+ eval(percept: RLPercept)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="29HbRJZK24xHVCOGVFIw-24" vertex="1">
+          <mxGeometry y="34" width="200" height="56" as="geometry" />
         </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.301;entryY=-0.004;entryDx=0;entryDy=0;entryPerimeter=0;dashed=1;" edge="1" parent="29HbRJZK24xHVCOGVFIw-1" source="29HbRJZK24xHVCOGVFIw-18" target="29HbRJZK24xHVCOGVFIw-24">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="29HbRJZK24xHVCOGVFIw-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;dashed=1;startArrow=classic;startFill=1;" parent="1" source="29HbRJZK24xHVCOGVFIw-18" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-60" y="480" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.701;entryY=0.04;entryDx=0;entryDy=0;entryPerimeter=0;endArrow=none;endFill=0;startArrow=classic;startFill=1;dashed=1;" edge="1" parent="29HbRJZK24xHVCOGVFIw-1" source="29HbRJZK24xHVCOGVFIw-18" target="29HbRJZK24xHVCOGVFIw-24">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-4" value="APIInterface&lt;br&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="260" y="-240" width="200" height="80" as="geometry" />
-        </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-5" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="29HbRJZK24xHVCOGVFIw-4">
-          <mxGeometry y="26" width="200" height="8" as="geometry" />
-        </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-6" value="+ initialize()&lt;br&gt;+ step(percept: RLPercept)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="29HbRJZK24xHVCOGVFIw-4">
-          <mxGeometry y="34" width="200" height="46" as="geometry" />
-        </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.498;entryY=0.986;entryDx=0;entryDy=0;entryPerimeter=0;endArrow=diamond;endFill=1;" edge="1" parent="1" source="29HbRJZK24xHVCOGVFIw-1" target="29HbRJZK24xHVCOGVFIw-6">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-12" value="Environment" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
-          <mxGeometry x="305" y="-400" width="110" height="110" as="geometry" />
-        </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.363;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;endArrow=classic;endFill=1;dashed=1;" edge="1" parent="1" source="29HbRJZK24xHVCOGVFIw-12" target="29HbRJZK24xHVCOGVFIw-4">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.634;entryY=0.02;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=classic;startFill=1;endArrow=none;endFill=0;dashed=1;" edge="1" parent="1" source="29HbRJZK24xHVCOGVFIw-12" target="29HbRJZK24xHVCOGVFIw-4">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.462;entryY=1.003;entryDx=0;entryDy=0;entryPerimeter=0;endArrow=block;endFill=1;" edge="1" parent="1" source="29HbRJZK24xHVCOGVFIw-18" target="ySceeVKdL_UXed-vuoVS-9">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="29HbRJZK24xHVCOGVFIw-20" value="&lt;h1&gt;Environment&lt;/h1&gt;&lt;div&gt;In our experiment, it is implemented in Godot. In practice, it can be whatever as long as it communicates with CST through the specified interface&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="460" y="-405" width="190" height="120" as="geometry" />
+        <mxCell id="-_geianzP1pcsctmyrP5-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;startArrow=classic;startFill=1;endArrow=none;endFill=0;dashed=1;entryX=0.997;entryY=0.473;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="29HbRJZK24xHVCOGVFIw-12" target="-NE6A836NCrnR8vJoupu-23">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="825" y="340" as="sourcePoint" />
+            <mxPoint x="523" y="615" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>

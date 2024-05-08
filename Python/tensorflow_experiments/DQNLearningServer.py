@@ -58,6 +58,9 @@ discount = 0.0
 past_action = None
 past_state = None
 
+global collect_policy
+global policy
+
 replay_buffer = None
 rb_observer = None
 iterator = None
@@ -124,6 +127,9 @@ def initialize():
         global replay_buffer
         global rb_observer
 
+        global collect_policy
+        global policy
+
         # Loads configuration
         config_dict = json.loads(request.data)
 
@@ -134,15 +140,22 @@ def initialize():
             if field in config_dict:
                 if config_dict[field]["type"] == "float32":
                     # Fixes shape
-                    config_dict[field]["shape"] = np.shape(config_dict[field]["shape"])
+                    if "preset" in config_dict[field]:
+                        match config_dict[field]["preset"]:
+                            case "freeway":
+                                config_dict[field]["shape"] = (210, 160, 3)
+                                config_dict[field]["mins"] = np.full(config_dict[field]["shape"], 0)
+                                config_dict[field]["maxs"] = np.full(config_dict[field]["shape"], 255)
+                    else:
+                        config_dict[field]["shape"] = np.shape(config_dict[field]["shape"])
 
-                    # Fixes infinity
-                    for val_field in ["mins", "maxs"]:
-                        for i in range(len(config_dict[field][val_field])):
-                            if config_dict[field][val_field][i] == "-inf":
-                                config_dict[field][val_field][i] = -np.inf
-                            elif config_dict[field][val_field][i] == "inf":
-                                config_dict[field][val_field][i] = np.inf
+                        # Fixes infinity
+                        for val_field in ["mins", "maxs"]:
+                            for i in range(len(config_dict[field][val_field])):
+                                if config_dict[field][val_field][i] == "-inf":
+                                    config_dict[field][val_field][i] = -np.inf
+                                elif config_dict[field][val_field][i] == "inf":
+                                    config_dict[field][val_field][i] = np.inf
                 elif config_dict[field]["type"] == "int64":
                     config_dict[field]["shape"] = tf.TensorShape([])
 
@@ -176,12 +189,30 @@ def initialize():
         # Network
         layers = []
 
-        for layer_spec in config_dict["network"]:
+        for i in range(len(config_dict["network"])):
+            layer_spec = config_dict["network"][i]
             match layer_spec["type"]:
                 case "dense":
                     layers.append(tf.keras.layers.Dense(layer_spec["units"], 
                                                        activation=activation_string_to_activation[layer_spec["activation"]],
                                                        kernel_initializer=tf.keras.initializers.VarianceScaling(scale=2.0, mode='fan_in', distribution='truncated_normal')))
+                case "conv2d":
+                    if i == 0:
+                        layers.append(tf.keras.layers.Conv2D(layer_spec["filter_count"],
+                                                            (layer_spec["kernel_size_x"], layer_spec["kernel_size_y"]),
+                                                            padding=layer_spec["padding"] if "padding" in layer_spec else "valid",
+                                                            input_shape=config_dict["observation"]["shape"],
+                                                            activation=activation_string_to_activation[layer_spec["activation"]]))
+                    else:
+                        layers.append(tf.keras.layers.Conv2D(layer_spec["filter_count"],
+                                                            (layer_spec["kernel_size_x"], layer_spec["kernel_size_y"]),
+                                                            padding=layer_spec["padding"] if "padding" in layer_spec else "valid",
+                                                            activation=activation_string_to_activation[layer_spec["activation"]]))
+                case "maxpooling2d":
+                    layers.append(tf.keras.layers.MaxPooling2D((layer_spec["pool_size_x"], layer_spec["pool_size_y"]),
+                                                               strides=layer_spec["strides"]))
+                case "flatten":
+                    layers.append(tf.keras.layers.Flatten())
                 case _:
                     return {"info": f"Failed to initialize agent - Unrecognized layer type \"{layer_spec['type']}\""}
         
@@ -253,6 +284,9 @@ def initialize():
         past_action = None
         past_state = None
 
+        collect_policy = py_tf_eager_policy.PyTFEagerPolicy(agent.collect_policy, use_tf_function=True)
+        policy = py_tf_eager_policy.PyTFEagerPolicy(agent.policy, use_tf_function=True)
+
         # Returns info
         return {"info": "Agent initialized"}
 
@@ -282,6 +316,8 @@ def step():
         global rb_observer
         global iterator
 
+        global collect_policy
+
         # Consumes step data from client
         data = json.loads(request.data) # {"state": [float], "reward": float, "terminal": bool}
 
@@ -294,7 +330,7 @@ def step():
                                    np.array(0, dtype=np.int32),
                                    np.array(data["reward"], dtype=np.float32),
                                    np.array(discount, dtype=np.float32)))
-            
+
             step_count += 1
 
             if step_count == initial_collect_steps: # Create dataset and iterator once rb is filled enough
@@ -304,13 +340,17 @@ def step():
                 iterator = iter(dataset)
             
             if step_count >= initial_collect_steps: # Sample a batch of data from the buffer and update the agent's network.
+                reward = np.array(data["reward"], dtype=np.float32)
+                
                 experience, unused_info = next(iterator)
                 train_loss = agent.train(experience).loss
+            
+                print(f"Loss - {train_loss}")
         
-        past_action = py_tf_eager_policy.PyTFEagerPolicy(agent.collect_policy, use_tf_function=True).action(TimeStep(np.array(0, dtype=np.int32),
-                                                                                                                np.array(data["reward"], dtype=np.float32),
-                                                                                                                np.array(discount, dtype=np.float32),
-                                                                                                                np.array(data["observation"], dtype=np.float32))).action
+        past_action = collect_policy.action(TimeStep(np.array(0, dtype=np.int32),
+                                                        np.array(data["reward"], dtype=np.float32),
+                                                        np.array(discount, dtype=np.float32),
+                                                        np.array(data["observation"], dtype=np.float32))).action
         past_state = data["observation"]
 
         # Returns the action the agent should take
@@ -332,13 +372,15 @@ def eval():
         # Declares global vars
         global agent
 
+        global policy
+
         # Consumes step data from client
         data = json.loads(request.data) # {"state": [float], "reward": float, "terminal": bool}
         
-        action = py_tf_eager_policy.PyTFEagerPolicy(agent.policy, use_tf_function=True).action(TimeStep(np.array(0, dtype=np.int32),
-                                                                                                                np.array(data["reward"], dtype=np.float32),
-                                                                                                                np.array(discount, dtype=np.float32),
-                                                                                                                np.array(data["observation"], dtype=np.float32))).action
+        action = policy.action(TimeStep(np.array(0, dtype=np.int32),
+                                        np.array(data["reward"], dtype=np.float32),
+                                        np.array(discount, dtype=np.float32),
+                                        np.array(data["observation"], dtype=np.float32))).action
 
         # Returns the action the agent should take
         return {"action": action.tolist()}
