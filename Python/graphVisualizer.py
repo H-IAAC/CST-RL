@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-name = "TensorforceLearner(configPath=tensorforce.json)"
+name = "TensorflowLearner(configPath=freeway.json)"
 interval = 10
 
 data = np.loadtxt(open(f"CSTRL/graphs/{name}.csv"), delimiter=",")
